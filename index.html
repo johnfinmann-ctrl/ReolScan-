@@ -913,12 +913,167 @@ function loadDB(){
       });
       return db;
     }
-  }catch(e){}
+  }catch(e){
+    /* Læsning/migrering fejlede: overskriv ALDRIG de gemte data. Gem en kopi af rådata og start med tom visning. */
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ localStorage.setItem(STORAGE_KEY+'_corrupt_'+Date.now(), raw); }
+    }catch(e2){}
+    _dbCorrupt = true;
+    _loadWarning = '⚠️ De gemte data kunne ikke læses. De er IKKE slettet – en kopi er bevaret på enheden. Importér en backup under System → Import, eller kontakt support, før du opretter nye eftersyn.';
+    return seedDB();
+  }
   const fresh = seedDB();
   saveDB(fresh);
   return fresh;
 }
-function saveDB(db){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+var _saveErrShown=false, _lowSpaceWarned=false, _dbCorrupt=false, _loadWarning=null;
+function showDataBanner(msg){
+  try{
+    if(!document.body) return;
+    let b=document.getElementById('dataBanner');
+    if(!b){
+      b=document.createElement('div'); b.id='dataBanner';
+      b.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99999;background:#C62828;color:#fff;padding:14px 16px;font-size:15px;font-weight:600;line-height:1.4;box-shadow:0 2px 12px rgba(0,0,0,.4)';
+      document.body.appendChild(b);
+    }
+    b.innerHTML='<div style="max-width:900px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px">'+msg+'</div>'
+      +'<button onclick="adminBackupExport()" style="background:#fff;color:#C62828;border:0;border-radius:8px;padding:10px 14px;font-weight:700;font-size:14px">📦 Gem backup nu</button>'
+      +'<button onclick="this.closest(\'#dataBanner\').remove()" style="background:transparent;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:10px 14px;font-size:14px">Luk</button></div>';
+  }catch(e){}
+}
+function hideDataBanner(){ try{ const b=document.getElementById('dataBanner'); if(b) b.remove(); }catch(e){} }
+function saveDB(db){
+  let str;
+  try{
+    str = JSON.stringify(db);
+    localStorage.setItem(STORAGE_KEY, str);
+  }catch(e){
+    _saveErrShown=true;
+    showDataBanner('⚠️ DATA ER IKKE GEMT. Enhedens lager er fuldt eller blokeret. Dine seneste ændringer findes kun i denne åbne visning og går tabt ved genindlæsning. Tryk "Gem backup nu" og fjern evt. store billeder/tegninger.');
+    return false;
+  }
+  if(_saveErrShown){ _saveErrShown=false; hideDataBanner(); }
+  if(str.length>4000000 && !_lowSpaceWarned){
+    _lowSpaceWarned=true;
+    if(typeof toast==='function') toast('Lageret er næsten fuldt ('+(str.length/1048576).toFixed(1)+' MB). Tag en backup under System → Backup.');
+  }
+  return true;
+}
+function storageInfo(){
+  try{ const raw=localStorage.getItem(STORAGE_KEY)||''; return {mb:raw.length/1048576, pct:Math.min(100,Math.round(raw.length/50000))}; }catch(e){ return {mb:0,pct:0}; }
+}
+/* Komprimér foto/tegning før lagring (localStorage har ca. 5 MB). Returnerer dataURL. */
+function compressImage(file, maxDim, quality){
+  maxDim=maxDim||1600; quality=quality||0.8;
+  return new Promise(resolve=>{
+    const fallback=()=>{ const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=()=>resolve(null); r.readAsDataURL(file); };
+    if(!file || !/^image\//.test(file.type) || !window.URL || !URL.createObjectURL){ fallback(); return; }
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        const k=Math.min(1, maxDim/Math.max(w,h));
+        w=Math.max(1,Math.round(w*k)); h=Math.max(1,Math.round(h*k));
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        const ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h);
+        const out=c.toDataURL('image/jpeg',quality);
+        URL.revokeObjectURL(url); resolve(out);
+      }catch(e){ URL.revokeObjectURL(url); fallback(); }
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(url); fallback(); };
+    img.src=url;
+  });
+}
+
+/* ---- Adressesøgning: Adressevælger (Klimadatastyrelsen, afløser for DAWA som lukkede 1.10.2026) ---- */
+const ADDR_BASE_URL = 'https://adressevaelger.dk';
+function getAddrToken(){ try{ return localStorage.getItem('reolscan_addr_token')||''; }catch(e){ return ''; } }
+function setAddrToken(t){ try{ localStorage.setItem('reolscan_addr_token',(t||'').trim()); }catch(e){} }
+function addrHint(box, msg){
+  box.innerHTML='<div style="padding:10px 12px;font-size:13px;color:#5b6b7a">'+msg+'</div>'; box.style.display='block';
+}
+async function addrFetch(q){
+  const token=getAddrToken();
+  if(!token) throw new Error('NO_TOKEN');
+  if(typeof navigator!=='undefined' && navigator.onLine===false) throw new Error('OFFLINE');
+  const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  const timer=setTimeout(()=>{ if(ctl) ctl.abort(); },7000);
+  try{
+    const url=ADDR_BASE_URL+'/husnumre/soeg?tekst='+encodeURIComponent(q)+'&maxResults=8&token='+encodeURIComponent(token);
+    const res=await fetch(url,{signal:ctl?ctl.signal:undefined});
+    if(res.status===401||res.status===403) throw new Error('BAD_TOKEN');
+    if(!res.ok) throw new Error('HTTP_'+res.status);
+    const data=await res.json();
+    const arr=Array.isArray(data)?data:(data.results||data.data||data.resultater||[]);
+    return arr.map(x=>({text:(x.titel||x.betegnelse||x.tekst||'').trim()})).filter(x=>x.text);
+  } finally { clearTimeout(timer); }
+}
+function attachAddressSearch(inputId){
+  const input=document.getElementById(inputId);
+  if(!input || input.dataset.addrBound) return;
+  input.dataset.addrBound='1';
+  input.setAttribute('autocomplete','off');
+  const wrap=input.parentNode; wrap.style.position='relative';
+  const box=document.createElement('div');
+  box.style.cssText='display:none;position:absolute;left:0;right:0;top:100%;z-index:50;background:#fff;border:1.5px solid #d5dde5;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:280px;overflow:auto;margin-top:4px';
+  wrap.appendChild(box);
+  let timer=null, seq=0, items=[], active=-1;
+  const close=()=>{ box.style.display='none'; box.innerHTML=''; items=[]; active=-1; };
+  const pick=(i)=>{
+    if(!items[i]) return;
+    input.value=items[i].text; close();
+    input.dispatchEvent(new Event('change',{bubbles:true}));
+  };
+  const draw=()=>{
+    box.innerHTML=items.map((it,i)=>'<div data-i="'+i+'" style="padding:14px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid #eef2f6;'+(i===active?'background:#e8f0fa;':'')+'">'+esc(it.text)+'</div>').join('');
+    box.style.display=items.length?'block':'none';
+    Array.from(box.children).forEach(ch=>{
+      const i=Number(ch.dataset.i);
+      ch.addEventListener('mousedown',e=>{ e.preventDefault(); pick(i); });
+      ch.addEventListener('touchend',e=>{ e.preventDefault(); pick(i); });
+    });
+  };
+  input.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const q=input.value.trim();
+    if(q.length<3){ close(); return; }
+    timer=setTimeout(async()=>{
+      const my=++seq;
+      try{
+        const r=await addrFetch(q);
+        if(my!==seq) return;
+        items=r; active=-1;
+        if(!r.length) addrHint(box,'Ingen forslag – skriv adressen manuelt.'); else draw();
+      }catch(e){
+        if(my!==seq) return;
+        const m=String(e&&e.message||e);
+        if(m==='NO_TOKEN') addrHint(box,'Adresseforslag er ikke slået til (token mangler under System → Standardværdier). Skriv adressen manuelt.');
+        else if(m==='OFFLINE') addrHint(box,'Offline – skriv adressen manuelt.');
+        else if(m==='BAD_TOKEN') addrHint(box,'Adresseforslag afvist (ugyldigt token). Skriv adressen manuelt.');
+        else addrHint(box,'Adresseforslag kan ikke hentes lige nu. Skriv adressen manuelt.');
+      }
+    },300);
+  });
+  input.addEventListener('keydown',e=>{
+    if(box.style.display==='none' || !items.length) return;
+    if(e.key==='ArrowDown'){ active=Math.min(items.length-1,active+1); draw(); e.preventDefault(); }
+    else if(e.key==='ArrowUp'){ active=Math.max(0,active-1); draw(); e.preventDefault(); }
+    else if(e.key==='Enter' && active>=0){ pick(active); e.preventDefault(); }
+    else if(e.key==='Escape'){ close(); }
+  });
+  input.addEventListener('blur',()=>setTimeout(close,200));
+}
+async function testAddrToken(){
+  const out=document.getElementById('addrTestResult'); if(!out) return;
+  const t=document.getElementById('cfg_addrToken'); if(t) setAddrToken(t.value);
+  out.textContent='Tester…';
+  try{ const r=await addrFetch('Rådhuspladsen 1'); out.textContent = r.length? '✅ Virker – fx: '+r[0].text : 'Forbindelse OK, men ingen resultater.'; out.style.color='var(--green)'; }
+  catch(e){ const m=String(e&&e.message||e);
+    out.style.color='var(--red)';
+    out.textContent = m==='NO_TOKEN'?'Indtast et token først.': m==='OFFLINE'?'Ingen internetforbindelse.': m==='BAD_TOKEN'?'Token afvist af Adressevælger.':'Kunne ikke kontakte Adressevælger ('+m+').'; }
+}
 
 let DB = loadDB();
 let state = {
@@ -980,6 +1135,7 @@ function render(){
     case 'adminLicense': setCrumb('System · Licens & Version'); v.innerHTML = renderAdminLicense(); break;
     case 'reportNotFound': setCrumb('Rapport'); v.innerHTML = renderReportNotFound(); break;
   }
+  setTimeout(()=>{ try{ attachAddressSearch('f_address'); attachAddressSearch('w_address'); }catch(e){} },0);
 }
 
 function getInspection(id){ return DB.inspections.find(i=>i.id===id); }
@@ -1238,7 +1394,7 @@ function renderWizard(){
   const tabs = WIZARD_TABS.map(t=>{
     let done = false;
     if(t.key==='stamdata') done = !!insp.customerName;
-    if(t.key==='tegning') done = !!insp.drawing;
+    if(t.key==='tegning') done = !!insp.drawing || !!insp.noDrawing;
     if(t.key==='reoler') done = insp.reoler.length>0;
     if(t.key==='skader') done = true; // optional
     if(t.key==='underskrift') done = !!(insp.signatures.inspector && insp.signatures.customer);
@@ -1374,6 +1530,8 @@ function wizardTegning(insp){
     <div class="btn-row" style="margin-bottom:14px;margin-top:0">
       ${TEGNING_FILTERS.map(f=>`<button class="btn ${filter===f.key?'btn-primary':'btn-ghost'}" style="padding:9px 16px;font-size:13px" onclick="setTegningFilter('${f.key}')">${f.label}</button>`).join('')}
     </div>`:''}
+    ${!insp.drawing ? `<div class="btn-row" style="margin:0 0 14px"><button class="btn btn-primary" style="width:100%;padding:18px 20px;font-size:17px" onclick="skipDrawing()">Ingen tegning – fortsæt</button></div>
+    <p style="font-size:13px;color:var(--grey-mid);margin:-4px 0 14px">Tegning er valgfri. Du kan oprette haller, reolrækker og reoler uden tegning og uploade en tegning senere.</p>` : ''}
     <div class="drawing-area" id="drawingArea" style="${hlPin?'overflow:hidden':''}" onclick="${isImage?'onDrawingClick(event)':''}">
       <div style="${zoomStyle}width:100%;height:100%;position:relative">${content}${pinsHtml}</div>
     </div>
@@ -1408,18 +1566,28 @@ function quickAddPin(reolId){
   toast('Tryk på tegningen for at placere '+reolId);
 }
 
+function skipDrawing(){
+  const insp = getInspection(state.currentInspectionId);
+  if(insp){ insp.noDrawing = true; saveDB(DB); }
+  setWizardTab('reoler');
+}
 function uploadDrawing(e){
   const file = e.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
+  const isPdf = file.type==='application/pdf';
+  const load = isPdf
+    ? new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>res(null); r.readAsDataURL(file); })
+    : compressImage(file, 2200, 0.85);
+  load.then(data=>{
+    if(!data){ toast('Tegningen kunne ikke læses'); return; }
     const insp = getInspection(state.currentInspectionId);
-    insp.drawing = {type: file.type==='application/pdf'?'pdf':'image', data: ev.target.result, name:file.name};
+    const prev = {drawing:insp.drawing, noDrawing:insp.noDrawing, reolPins:insp.reolPins};
+    insp.drawing = {type: isPdf?'pdf':'image', data, name:file.name};
+    insp.noDrawing = false;
     insp.reolPins = insp.reolPins || [];
-    saveDB(DB);
+    if(!saveDB(DB)){ insp.drawing=prev.drawing; insp.noDrawing=prev.noDrawing; insp.reolPins=prev.reolPins; toast('Tegningen er for stor til at gemme på enheden'); }
     render();
-  };
-  reader.readAsDataURL(file);
+  });
 }
 function removeDrawing(){
   const insp = getInspection(state.currentInspectionId);
@@ -2106,13 +2274,11 @@ function workAddPhoto(e){
   const files = Array.from(e.target.files);
   let remaining = files.length;
   files.forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = ev=>{
-      state.workForm.photos.push(ev.target.result);
+    compressImage(file, 1400, 0.72).then(data=>{
+      if(data) state.workForm.photos.push(data); else toast('Billedet kunne ikke læses');
       remaining--;
       if(remaining<=0){ render(); scrollToActiveStep(); }
-    };
-    reader.readAsDataURL(file);
+    });
   });
 }
 function scrollToActiveStep(){
@@ -2387,9 +2553,7 @@ function renderSkadePhotoGrid(){
 function addSkadePhoto(e){
   const files = Array.from(e.target.files);
   files.forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = ev=>{ state.newSkadePhotos.push(ev.target.result); renderSkadePhotoGrid(); };
-    reader.readAsDataURL(file);
+    compressImage(file, 1400, 0.72).then(data=>{ if(data){ state.newSkadePhotos.push(data); renderSkadePhotoGrid(); } else toast('Billedet kunne ikke læses'); });
   });
 }
 function removeSkadePhoto(i){ state.newSkadePhotos.splice(i,1); renderSkadePhotoGrid(); }
@@ -2407,9 +2571,7 @@ function renderSkadePhotoGridAfter(){
 function addSkadePhotoAfter(e){
   const files = Array.from(e.target.files);
   files.forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = ev=>{ state.newSkadePhotosAfter.push(ev.target.result); renderSkadePhotoGridAfter(); };
-    reader.readAsDataURL(file);
+    compressImage(file, 1400, 0.72).then(data=>{ if(data){ state.newSkadePhotosAfter.push(data); renderSkadePhotoGridAfter(); } else toast('Billedet kunne ikke læses'); });
   });
 }
 function removeSkadePhotoAfter(i){ state.newSkadePhotosAfter.splice(i,1); renderSkadePhotoGridAfter(); }
@@ -3010,7 +3172,7 @@ function renderReports(){
           <button class="btn btn-ghost" onclick="state.currentInspectionId='${i.id}';state.view='wizard';state.wizardTab='reoler';render()">Vis detaljer</button>
           <button class="btn btn-primary" onclick="generatePDF('${i.id}')">⬇️ Download PDF</button>
           <button class="btn btn-ghost share-btn" onclick="sharePDF('${i.id}')">🔗 Del PDF</button>
-          <button class="btn btn-ghost" onclick="testQR('${i.id}')">🔗 Test QR</button>
+          <button class="btn btn-ghost" onclick="testQR('${i.id}')" title="Åbner rapporten på denne enhed">🔗 Test QR</button>
         </div>
       </div>`;
     }).join('')}
@@ -3705,7 +3867,8 @@ function renderReportNotFound(){
     <div class="empty">
       <span class="icon">❌</span>
       <h3>Rapport ikke fundet.</h3>
-      <p>Der findes ingen rapport med nummeret <span class="mono">${esc(state.reportNotFoundNumber||'')}</span> i ReolScan.</p>
+      <p>Der findes ingen rapport med nummeret <span class="mono">${esc(state.reportNotFoundNumber||'')}</span> på denne enhed.</p>
+      <p style="font-size:13px;color:var(--grey-mid);max-width:440px;margin:10px auto 0">Rapporter i ReolScan er gemt lokalt på den enhed, hvor eftersynet blev udført, og kan ikke åbnes via QR-kode på andre enheder. Åbn ReolScan på den oprindelige enhed – eller brug den PDF, der blev delt.</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goHome()">← Forside</button>
@@ -3777,12 +3940,12 @@ function renderAdmin(){
     <div class="tile" onclick="adminBackupExport()">
       <div class="icon">📦</div>
       <h3>Backup</h3>
-      <p>Eksportér al data som JSON-fil.</p>
+      <p>Eksportér al data som JSON-fil. Lager brugt: ${storageInfo().mb.toFixed(1)} MB (${storageInfo().pct}%).</p>
     </div>
     <div class="tile" onclick="adminImportTrigger()">
       <div class="icon">📥</div>
       <h3>Import</h3>
-      <p>Indlæs data fra JSON-backup.</p>
+      <p>Gendan fra JSON-backup. Advarer før eksisterende data erstattes.</p>
     </div>
     <div class="tile" onclick="adminBackupExport()">
       <div class="icon">📤</div>
@@ -3802,7 +3965,7 @@ function renderAdmin(){
     <div class="tile" onclick="state.view='adminLicense';render()">
       <div class="icon">🔑</div>
       <h3>Licens &amp; Version</h3>
-      <p>ReolScan v1.0 — Reoler A/S.</p>
+      <p>ReolScan RC5.1 — Reoler A/S.</p>
     </div>
   </div>
 
@@ -3817,7 +3980,7 @@ function renderAdminLicense(){
   return `
   <div class="panel">
     <div class="formgrid">
-      <div class="field"><label>Version</label><input value="ReolScan v1.0" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.1" readonly></div>
       <div class="field"><label>Licens</label><input value="Reoler A/S" readonly></div>
     </div>
   </div>
@@ -3995,6 +4158,15 @@ function renderAdminDefaults(){
       <span class="pill red">Rød</span>
     </div>
   </div>
+  <div class="panel">
+    <h2>📍 Adresseforslag</h2>
+    <p style="font-size:13px;color:var(--grey-mid)">Forslag til danske adresser hentes fra Adressevælger (Klimadatastyrelsen, afløser for DAWA). Kræver internet og et token fra Klimadatastyrelsen. Uden token eller offline kan adressen altid skrives manuelt.</p>
+    <div class="formgrid">
+      <div class="field full"><label>Adressevælger-token</label><input id="cfg_addrToken" value="${esc(getAddrToken())}" placeholder="Indsæt token" autocomplete="off" onchange="setAddrToken(this.value);toast('Token gemt')"></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-ghost" onclick="testAddrToken()">🔎 Test adresseforslag</button></div>
+    <p id="addrTestResult" style="font-size:13px;min-height:18px;margin:8px 0 0"></p>
+  </div>
   <div class="btn-row">
     <button class="btn btn-ghost" onclick="state.view='admin';render()">← Tilbage til System</button>
   </div>`;
@@ -4002,34 +4174,69 @@ function renderAdminDefaults(){
 function adminImportTrigger(){
   document.getElementById('adminImportFile').click();
 }
+function backupCounts(d){
+  const insp=(d.inspections||[]);
+  return {kunder:(d.customers||[]).length, eftersyn:insp.length, reoler:insp.reduce((n,x)=>n+((x.reoler||[]).length),0), skader:insp.reduce((n,x)=>n+((x.skader||[]).length),0)};
+}
 function adminImportFile(e){
   const file = e.target.files[0];
   if(!file) return;
+  const input = e.target;
   const reader = new FileReader();
+  reader.onerror = ()=>{ toast('Filen kunne ikke læses'); input.value=''; };
   reader.onload = ev=>{
+    let imported;
+    try{ imported = JSON.parse(ev.target.result); }
+    catch(err){ toast('Kunne ikke læse filen — ugyldig JSON. Eksisterende data er uændret.'); input.value=''; return; }
+    if(!imported || !Array.isArray(imported.customers) || !Array.isArray(imported.inspections)){
+      toast('Filen er ikke en gyldig ReolScan-backup. Eksisterende data er uændret.'); input.value=''; return;
+    }
+    const cur = backupCounts(DB), inc = backupCounts(imported);
+    const meta = imported._backup ? ('\nBackup oprettet: '+(imported._backup.exportedAt||'ukendt')+' (ReolScan '+(imported._backup.version||'?')+')') : '\n(Ældre backup uden metadata)';
+    const msg = '⚠️ GENDAN BACKUP\n\nDette ERSTATTER alle data på denne enhed.\n\n'
+      + 'Nu på enheden: '+cur.kunder+' kunder, '+cur.eftersyn+' eftersyn, '+cur.reoler+' reoler, '+cur.skader+' skader\n'
+      + 'I backup-filen: '+inc.kunder+' kunder, '+inc.eftersyn+' eftersyn, '+inc.reoler+' reoler, '+inc.skader+' skader'
+      + meta + '\n\nEn sikkerhedskopi af nuværende data hentes automatisk først.\n\nFortsæt?';
+    if(!confirm(msg)){ toast('Import annulleret — ingen data ændret'); input.value=''; return; }
+    const previous = DB;
+    adminBackupExport('foer-import');
     try{
-      const imported = JSON.parse(ev.target.result);
-      if(!imported.customers || !imported.inspections){ toast('Filen indeholder ikke gyldig ReolScan-data'); return; }
-      DB = imported;
-      DB.config = DB.config || seedDB().config;
-      DB.pilotFeedback = DB.pilotFeedback || [];
-      saveDB(DB);
-      toast('Data importeret');
-      render();
-    }catch(err){ toast('Kunne ikke læse filen — ugyldig JSON'); }
+      delete imported._backup;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+    }catch(err){
+      DB = previous; saveDB(DB);
+      showDataBanner('⚠️ Import mislykkedes: backup-filen er for stor til enhedens lager. Eksisterende data er bevaret.');
+      input.value=''; return;
+    }
+    const loaded = loadDB();
+    if(_dbCorrupt){ _dbCorrupt=false; DB = previous; saveDB(DB); toast('Backup-filen kunne ikke anvendes — eksisterende data er bevaret'); input.value=''; return; }
+    DB = loaded;
+    state.currentInspectionId = null; state.view='admin';
+    toast('Backup gendannet: '+inc.eftersyn+' eftersyn, '+inc.kunder+' kunder');
+    input.value='';
+    render();
   };
   reader.readAsText(file);
 }
-function adminBackupExport(){
-  const dataStr = JSON.stringify(DB, null, 2);
-  const blob = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-  const a = document.createElement('a');
-  a.href = blob;
-  a.download = 'reolscan-backup-'+todayISO()+'.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  toast('Backup eksporteret');
+function adminBackupExport(tag){
+  try{
+    const out = Object.assign({}, DB, {_backup:{app:'ReolScan', version:'RC5.1', exportedAt:new Date().toISOString(), counts:backupCounts(DB)}});
+    const dataStr = JSON.stringify(out, null, 2);
+    const blob = new Blob([dataStr], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'reolscan-backup-'+(typeof tag==='string'?tag+'-':'')+todayISO()+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    toast('Backup eksporteret ('+(dataStr.length/1048576).toFixed(1)+' MB)');
+    return true;
+  }catch(err){
+    showDataBanner('⚠️ Backup kunne ikke oprettes: '+(err&&err.message?err.message:err));
+    return false;
+  }
 }
 function renderAdminSecurity(){
   return `
@@ -4119,7 +4326,7 @@ function renderSettings(){
     <h2>Indstillinger</h2>
     <div class="formgrid">
       <div class="field"><label>Standard-inspektør</label><input id="settings_inspector" value="${getInspectorName()}" onchange="setInspectorName(this.value)" placeholder="Dit navn"></div>
-      <div class="field"><label>Version</label><input value="ReolScan v1.0" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.1" readonly></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="resetDemo()">↺ Nulstil demo-data</button>
@@ -4385,8 +4592,9 @@ function generatePDF(inspId){
   try{
     const qr = qrDataUrl(reportUrl(insp), 120);
     if(qr) doc.addImage(qr, 'PNG', W-M-26, 28, 26, 26);
-    doc.setFontSize(7); doc.setTextColor(140,150,160);
-    doc.text('Scan for at åbne rapport', W-M, 57, {align:'right'});
+    doc.setFontSize(6); doc.setTextColor(140,150,160);
+    doc.text('QR åbner kun rapporten i ReolScan', W-M, 57, {align:'right'});
+    doc.text('på den enhed, hvor den er gemt', W-M, 59.6, {align:'right'});
     doc.setTextColor(0,0,0);
   }catch(e){}
 
@@ -4666,11 +4874,13 @@ function toast(msg){
 
 /* init */
 resolveReportDeepLink();
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 // Skjul "Del PDF"-knapper på platforme der ikke understøtter Web Share API (fx Windows Chrome desktop)
 if(typeof navigator.share === 'undefined'){
   document.documentElement.classList.add('no-share');
 }
 render();
+if(_loadWarning) showDataBanner(_loadWarning);
 
 function resolveReportDeepLink(){
   try{
