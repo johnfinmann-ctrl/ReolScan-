@@ -1,33 +1,28 @@
-# ReolScan RC5.1 – Ændringslog
-Udgangspunkt: RC4 (ReolScan_v1_0_RC4.html). Der fandtes ingen nyere kode i projektet; ingen kode er overskrevet.
-Ingen redesign: alle eksisterende funktioner, felter, rapporter og arbejdsgange er uændrede. GitHub er IKKE opdateret.
+# ReolScan RC5.3 – Ændringslog (Reoler A/S branding)
+Udgangspunkt: RC5.2. Automatisk adressesøgning, "Ingen tegning", backup/import, registreringsforløb og forside (Start reoleftersyn / Fortsæt eftersyn / Eftersynsrapporter) er uændrede. GitHub er IKKE opdateret.
 
-## 1. Automatisk adressesøgning
-- DAWA (Danmarks Adresser) er lukket 1. oktober 2026. Officiel afløser: **Adressevælger** (Klimadatastyrelsen / SDFI).
-- Adressefeltet i "Start nyt eftersyn" og i Stamdata-fanen viser forslag fra 3 tegn; valg udfylder hele adressen. Piletaster/Enter/Esc og tryk på mobil virker.
-- Manuel indtastning er altid mulig. Uden token, offline eller ved fejl vises en rolig besked – ingen blokering.
-- Token til Adressevælger indtastes under System → Standardværdier → "Adresseforslag" (med Test-knap). Ingen nøgle er indlejret i koden.
-- Ingen nyt menupunkt.
+## 1. Logo
+- Det originale Reoler A/S-logo (fil leveret af dig, 200 px) er anvendt i stedet for "RA"-symbolet. Navnet "ReolScan" er bevaret ved siden af logoet.
+- Tre varianter er udledt af originalen og indlejret i `index.html` (objektet `BRAND`) – appen kalder aldrig reoler-as.dk, og filerne ligger også i mappen `logo/`:
+  - *Mørk baggrund* (topbjælke): "Reoler" i hvid; ikon, prik og "as" i lyseblå `#65BDDA` (samme to-tonede princip som hjemmesidens hvide logo).
+  - *Lys baggrund*: originale farver, gennemsigtig (vises under System → Licens & Version).
+  - *PDF-sidehoved*: mørk variant fladlagt på profilblå.
+- Den lille undertekst i topbjælken er forkortet til "Professionelle reoleftersyn" (logoet viser allerede firmanavnet). På mobil skjules underteksten, og brødkrummen vises kun fra 480 px bredde, så "← Forside" altid er synlig.
 
-## 2. Ingen tegning
-- Trin 2: tydelig knap "Ingen tegning – fortsæt" (øverst) → direkte til Reolregister. Trinnet markeres som færdigt.
-- Tegning er aldrig obligatorisk. Hal, reolrække og reolnummer kan oprettes uden tegning. Tegning kan uploades senere.
-- PDF-rapporten genereres korrekt uden tegning (verificeret).
+## 2. Farver
+- Profilblå `#00305F` (målt i logoets tekst) og lyseblå `#65BDDA` (fra hjemmesidens logo). Ændret centralt i CSS-variablerne `--navy`, `--navy-2` (#0B4478), `--navy-soft` (#E8F0F8) og nyt `--accent`.
+- Anvendt på: topbjælke (med lyseblå bundstreg), primære knapper, overskrifter, aktive faner/trin (med lyseblå markering), dashboard-tal og PDF-rapporter (sidehoved, lyseblå streg, overskrifter, linjer).
+- Grøn `#2E9E5B`, gul `#F2B705` og rød `#D6334A` til sikkerhedsklassifikation er uændrede (verificeret).
+- Den lyseblå bruges kun på mørk baggrund eller som streg – aldrig som tekst på hvid (lav kontrast).
 
-## 3. Datasikkerhed og backup
-- **Datatab-fejl rettet:** hvis de gemte data ikke kunne læses ved opstart, ville RC4 oprette tom database og overskrive dem. Nu bevares rådata (kopi under `reolscan_db_v1_corrupt_<tid>`), og en rød advarsel vises.
-- `saveDB` fanger nu lagerfejl (fuldt/blokeret) og viser en tydelig rød advarsel med "Gem backup nu". Advarsel når lageret nærmer sig fuld (>4 MB).
-- Fotos (skade, før/efter) og tegningsbilleder komprimeres før lagring (maks. 1400 px/2200 px, JPEG). Eksempel: 11,6 MB → ca. 0,5 MB. Hvis en tegning er for stor, rulles upload tilbage.
-- Backup: Blob-download (ikke data-URI), med metadata (version, tidspunkt, antal). Viser lagerforbrug i System.
-- Import: validerer filen, viser antal nu/i backup, **kræver bekræftelse før eksisterende data erstattes**, henter automatisk en sikkerhedskopi først, og ved fejl bevares eksisterende data. Annullér ændrer intet.
-- Browseren anmodes om vedvarende lager (`navigator.storage.persist`).
-- Ingen Supabase eller anden database.
-
-## 4. PDF og QR
-- PDF-forside: "QR åbner kun rapporten i ReolScan på den enhed, hvor den er gemt" (erstatter "Scan for at åbne rapport").
-- "Rapport ikke fundet" forklarer, at rapporter er lokale og ikke kan åbnes via QR på andre enheder.
-- PDF-layout, fotos, kontrolpunkter og underskrifter er uændrede.
-- Anbefaling (ikke implementeret): hvis QR skal virke på tværs af enheder, kræver det en fælles lagring (særskilt beslutning).
+## 3. PDF
+- Logoet står i sidehovedet på alle sider; "ReolScan · Reoleftersyn" og rapportnummer er bevaret. Den gamle tekstboks "REOLER A/S" på forsiden er fjernet, og afsenderlinjen står nu som tekst.
+- Øvrigt PDF-layout, fotos, kontrolpunkter, underskrifter og QR-tekst er uændrede.
 
 ## Øvrigt
-- Versionsnavn opdateret til "ReolScan RC5.1" (System → Licens & Version).
+Versionsnavn: ReolScan RC5.3.
+
+## Tillæg: logoet kan skiftes uden at redigere kode
+- Logoerne ligger nu som almindelige filer i `logo/` og hentes af `index.html`. Overskriv filerne (samme filnavn) for at skifte logo; eller ret stierne i `BRAND`-blokken øverst i scriptet ("SKIFT LOGO HER").
+- Findes filerne ikke, bruges en indlejret reserve (nederst i `index.html`, `BRAND_FALLBACK`).
+- `AENDRINGSLOG.md`/`TESTRESULTAT.md` ellers som beskrevet ovenfor; ingen funktionsændringer.
