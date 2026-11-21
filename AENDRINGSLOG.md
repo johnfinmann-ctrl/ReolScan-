@@ -1,28 +1,20 @@
-# ReolScan RC5.3 – Ændringslog (Reoler A/S branding)
-Udgangspunkt: RC5.2. Automatisk adressesøgning, "Ingen tegning", backup/import, registreringsforløb og forside (Start reoleftersyn / Fortsæt eftersyn / Eftersynsrapporter) er uændrede. GitHub er IKKE opdateret.
+# ReolScan RC5.4 – Faglig hjælp til reolinspektøren
 
-## 1. Logo
-- Det originale Reoler A/S-logo (fil leveret af dig, 200 px) er anvendt i stedet for "RA"-symbolet. Navnet "ReolScan" er bevaret ved siden af logoet.
-- Tre varianter er udledt af originalen og indlejret i `index.html` (objektet `BRAND`) – appen kalder aldrig reoler-as.dk, og filerne ligger også i mappen `logo/`:
-  - *Mørk baggrund* (topbjælke): "Reoler" i hvid; ikon, prik og "as" i lyseblå `#65BDDA` (samme to-tonede princip som hjemmesidens hvide logo).
-  - *Lys baggrund*: originale farver, gennemsigtig (vises under System → Licens & Version).
-  - *PDF-sidehoved*: mørk variant fladlagt på profilblå.
-- Den lille undertekst i topbjælken er forkortet til "Professionelle reoleftersyn" (logoet viser allerede firmanavnet). På mobil skjules underteksten, og brødkrummen vises kun fra 480 px bredde, så "← Forside" altid er synlig.
+## Nyt
+1. **Faglig hjælp** (forsiden, lille knap ved siden af System) → side med brochuren "Sikkerhed på lageret".
+2. **PDF-viser i appen** (pdf.js, lokal kopi): tydelig **Luk**-knap (også Esc), **Download PDF** (byte-identisk med originalen), side frem/tilbage, zoom, sidetal. Virker på PC, tablet og mobil.
+3. **Lokal kopi**: `faglig-hjaelp/Sikkerhed-paa-lageret.pdf` + `pdfjs/`. Virker uden reoler-as.dk. Åbnes appen direkte som fil, bruges en indlejret kopi (`brochure-data.js`). `sw.js` cacher app + brochure til **offline** brug (kræver http/https, fx GitHub Pages).
+4. **ⓘ-hjælp** ved kontrolpunkter og skadetyper: hvad der skal kontrolleres, opmærksomhedspunkter, målemetode, sidehenvisning, miniature af brochuresiden og knap "Åbn side X". Kun brochurens egne udsagn; hvor brochuren intet siger, står det.
+5. **Kontrolpunkter (14)** som valgfrit, lukket panel under Skader (OK / Afvigelse, kan fjernes). Ingen nye obligatoriske trin.
+6. Brochuren vises **uændret**; tegninger s. 5–6 er Reoler A/S' ejendom (se noten under Åbent punkt).
 
-## 2. Farver
-- Profilblå `#00305F` (målt i logoets tekst) og lyseblå `#65BDDA` (fra hjemmesidens logo). Ændret centralt i CSS-variablerne `--navy`, `--navy-2` (#0B4478), `--navy-soft` (#E8F0F8) og nyt `--accent`.
-- Anvendt på: topbjælke (med lyseblå bundstreg), primære knapper, overskrifter, aktive faner/trin (med lyseblå markering), dashboard-tal og PDF-rapporter (sidehoved, lyseblå streg, overskrifter, linjer).
-- Grøn `#2E9E5B`, gul `#F2B705` og rød `#D6334A` til sikkerhedsklassifikation er uændrede (verificeret).
-- Den lyseblå bruges kun på mørk baggrund eller som streg – aldrig som tekst på hvid (lav kontrast).
+## Rettet – automatisk godkendelse fjernet (krav 4)
+- **Fundet i RC5.3:** nye eftersyn fik en opdigtet tjekliste (13 × OK, Diagonaler = afvigelse), som kom i PDF'en. → Nu tom; kun inspektørens egne markeringer.
+- **Fundet:** `finishInspection` satte selv "Godkendt/…bemærkninger/Ikke godkendt" hvis inspektøren ikke valgte. → Nu kan eftersynet **ikke afsluttes** uden inspektørens egen samlede vurdering (knap deaktiveret + spærre i koden).
+- **Fundet:** skadetype forvalgte automatisk prioritet (rød/gul/grøn) og handlinger. → Nu **intet forvalgt**; vejledende forslag vises kun med stiplet kant. Inspektøren skal selv trykke prioritet (ét ekstra tryk pr. skade).
 
-## 3. PDF
-- Logoet står i sidehovedet på alle sider; "ReolScan · Reoleftersyn" og rapportnummer er bevaret. Den gamle tekstboks "REOLER A/S" på forsiden er fjernet, og afsenderlinjen står nu som tekst.
-- Øvrigt PDF-layout, fotos, kontrolpunkter, underskrifter og QR-tekst er uændrede.
+## Uændret
+14 kontrolpunkter, grøn/gul/rød, Reoler A/S logo og farver, forside (3 hovedfelter), RC5.2 adressesøgning, backup/data, PDF/QR. Intet Supabase. **GitHub er ikke opdateret.**
 
-## Øvrigt
-Versionsnavn: ReolScan RC5.3.
-
-## Tillæg: logoet kan skiftes uden at redigere kode
-- Logoerne ligger nu som almindelige filer i `logo/` og hentes af `index.html`. Overskriv filerne (samme filnavn) for at skifte logo; eller ret stierne i `BRAND`-blokken øverst i scriptet ("SKIFT LOGO HER").
-- Findes filerne ikke, bruges en indlejret reserve (nederst i `index.html`, `BRAND_FALLBACK`).
-- `AENDRINGSLOG.md`/`TESTRESULTAT.md` ellers som beskrevet ovenfor; ingen funktionsændringer.
+## Åbent punkt
+Bekræft hos Reoler A/S, at brochuren må indlægges i appen. Brochuren er brugt uændret.

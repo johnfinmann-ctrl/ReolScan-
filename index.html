@@ -720,6 +720,49 @@ header.topbar .brand-name{padding-left:12px;border-left:2px solid rgba(101,189,2
   header.topbar .crumb{display:none!important;}
   header.topbar .spacer{flex:1;}
 }
+/* ===== RC5.4 Faglig hjælp ===== */
+.fh-viewer{position:fixed;inset:0;z-index:300;background:#2b2f36;display:flex;flex-direction:column}
+body.fh-open{overflow:hidden}
+.fh-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--navy);color:#fff;padding:8px 12px}
+.fh-title{font-weight:700;flex:1;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fh-ctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fh-ctl button,.fh-close{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:10px;min-width:44px;min-height:44px;padding:0 12px;font-size:16px;cursor:pointer}
+.fh-close{background:#fff;color:var(--navy);font-weight:700;border-color:#fff}
+.fh-ctl .fh-dl{background:var(--accent);color:var(--navy);border-color:var(--accent);font-weight:700;font-size:14px}
+#fhPageInd{min-width:56px;text-align:center;font-size:14px}
+.fh-body{position:relative;flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px;text-align:center}
+.fh-page{display:inline-block;margin:0 auto 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.4);line-height:0;max-width:none}
+.fh-page canvas{display:block}
+.fh-msg{color:#fff;padding:40px 16px;font-size:15px;line-height:1.5}
+@media (max-width:600px){.fh-bar{gap:6px;padding:6px 8px}.fh-ctl{display:contents}.fh-ctl>*{order:2}.fh-ctl .fh-dl{order:0;margin-left:auto}.fh-title{order:1;flex-basis:100%;height:0;min-width:0;overflow:hidden;margin:0}.fh-ctl button,.fh-close{min-width:44px;min-height:44px;padding:0 10px}#fhPageInd{flex:1}}
+.fh-sheet h2{margin-bottom:10px}
+.fh-sec{margin:0 0 10px}.fh-sec b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-2)}
+.fh-sec p{margin:2px 0 0;font-size:14px;line-height:1.45}
+.fh-none{font-size:14px}
+.fh-disc{font-size:12px;color:var(--grey-mid);margin:10px 0 0;line-height:1.4}
+.fh-thumbs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.fh-thumb{background:#fff;border:1px solid #cfd8e3;border-radius:8px;padding:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--navy)}
+.fh-thumb canvas{display:block;max-width:130px}
+.fh-i{background:var(--navy-soft);color:var(--navy);border:1px solid #b9cde3;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;line-height:1;padding:0;flex:none}
+.tile-i{position:absolute;right:4px;top:4px;width:28px;height:28px;font-size:14px}
+.check-tile{position:relative}
+.fh-i-ph{width:32px;flex:none}
+.fh-card{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--navy-soft);border-radius:12px;padding:14px}
+.fh-card h3{margin:0 0 4px;color:var(--navy)}.fh-card p{margin:0;font-size:13px;color:var(--grey-mid);max-width:420px}
+.fh-list{border:1px solid #dbe4ee;border-radius:10px;overflow:hidden}
+.fh-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #eef2f7;font-size:14px}
+.fh-row:last-child{border-bottom:0}.fh-row>span:first-child{flex:1}.fh-pg{color:var(--grey-mid);font-size:13px}
+.fh-ctrl{margin:16px 0;border:1px solid #dbe4ee;border-radius:12px;padding:10px 12px;background:#fff}
+.fh-ctrl summary{cursor:pointer;font-weight:700;color:var(--navy);min-height:36px;display:flex;align-items:center;gap:8px}
+.fh-crow{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid #eef2f7}
+.fh-cl{flex:1;font-size:14px}
+.fh-mk{border:1px solid #c5d0dc;background:#fff;border-radius:8px;min-height:36px;padding:0 10px;font-size:13px;cursor:pointer}
+.fh-mk.ok.sel{background:var(--green);color:#fff;border-color:var(--green)}
+.fh-mk.bad.sel{background:var(--red);color:#fff;border-color:var(--red)}
+.priority-tile.suggest,.check-tile.suggest{outline:2px dashed var(--navy-2);outline-offset:-3px}
+.fh-suggest-note{font-size:12px;color:var(--grey-mid);margin:6px 0 0}
+.fh-hint{background:var(--navy-soft);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+@media print{.fh-viewer,.fh-i,.fh-ctrl{display:none!important}}
 </style>
 </head>
 <body>
@@ -1190,6 +1233,7 @@ function render(){
     case 'adminDemoData': setCrumb('System · Demo-data'); v.innerHTML = renderAdminDemoData(); break;
     case 'adminSecurity': setCrumb('System · Sikkerhed'); v.innerHTML = renderAdminSecurity(); break;
     case 'adminLicense': setCrumb('System · Licens & Version'); v.innerHTML = renderAdminLicense(); break;
+    case 'fagligHjaelp': setCrumb('Faglig hjælp'); v.innerHTML = renderFagligHjaelp(); break;
     case 'reportNotFound': setCrumb('Rapport'); v.innerHTML = renderReportNotFound(); break;
   }
   setTimeout(()=>{ try{ attachAddressSearch('f_address'); attachAddressSearch('w_address'); }catch(e){} },0);
@@ -1227,7 +1271,8 @@ function renderHome(){
   </div>
 
   <div class="system-link-row">
-    <button class="system-link-btn" onclick="openAdminPinPrompt()">🔒 System</button>
+    <button class="system-link-btn" onclick="state.view='fagligHjaelp';render()">📘 Faglig hjælp</button>
+    <button class="system-link-btn" style="margin-left:10px" onclick="openAdminPinPrompt()">🔒 System</button>
   </div>
   `;
 }
@@ -1329,7 +1374,7 @@ function createInspection(){
     inspector:val('f_inspector')||getInspectorName(),
     status:'open', vurdering:null,
     reportNumber:null,
-    nextInspection:null, checklist:{stolper:'ok',vanger:'ok',diagonaler:'fejl',bjaelker:'ok',forankring:'ok',sikringssplit:'ok',belastningsskilte:'ok',paakorselsvaern:'ok',raekvaerk:'ok',gangarealer:'ok',belysning:'ok',gulv:'ok',skiltning:'ok',orden:'ok'},
+    nextInspection:null, checklist:{},
     drawing:null,
     reoler:[],
     skader:[],
@@ -2060,8 +2105,10 @@ function wizardSkader(insp){
       <span class="pill red">Rød ${counts.red}</span>
     </div>
     ${insp.skader.length? renderGroupedSkadeCards(insp) : emptyState('📷','Ingen skader registreret','Tryk "Ny skade" for at registrere første skade.')}
+    ${fhCtrlPanel(insp)}
     <div class="btn-row">
       <button class="btn btn-green btn-lg" onclick="startWorkScreen()">📷 Ny skade</button>
+      <button class="btn btn-ghost" onclick="openBrochure(1)">📘 Faglig hjælp</button>
       <button class="btn btn-primary" onclick="setWizardTab('underskrift')">Næste: Underskrift →</button>
     </div>
   </div>`;
@@ -2262,7 +2309,7 @@ function renderWorkScreen(){
       <div class="check-grid">
         ${SKADE_TYPES.map(t=>`
           <div class="check-tile ${f.types[t.key]?'checked':''}" onclick="workToggleType('${t.key}')">
-            <div class="box">${f.types[t.key]?'✓':''}</div>${esc(t.label)}
+            <div class="box">${f.types[t.key]?'✓':''}</div>${esc(t.label)}${fhEntry('type',t.key)?`<button class="fh-i tile-i" onclick="event.stopPropagation();fhHelp('type','${t.key}')" aria-label="Faglig hjælp: ${esc(t.label)}">ⓘ</button>`:''}
           </div>`).join('')}
       </div>
     </div>`;
@@ -2275,10 +2322,11 @@ function renderWorkScreen(){
     <div class="work-step active-step" id="step-priority">
       <div class="big-step-label">🚦 Prioritet</div>
       <div class="priority-grid">
-        <div class="priority-tile green ${f.classification==='green'?'sel':''}" onclick="workSetClassification('green')"><div class="dot"></div>Lav</div>
-        <div class="priority-tile yellow ${f.classification==='yellow'?'sel':''}" onclick="workSetClassification('yellow')"><div class="dot"></div>Middel</div>
-        <div class="priority-tile red ${f.classification==='red'?'sel':''}" onclick="workSetClassification('red')"><div class="dot"></div>Høj</div>
+        <div class="priority-tile green ${f.classification==='green'?'sel':''} ${!f.classification&&f.suggestCls==='green'?'suggest':''}" onclick="workSetClassification('green')"><div class="dot"></div>Lav</div>
+        <div class="priority-tile yellow ${f.classification==='yellow'?'sel':''} ${!f.classification&&f.suggestCls==='yellow'?'suggest':''}" onclick="workSetClassification('yellow')"><div class="dot"></div>Middel</div>
+        <div class="priority-tile red ${f.classification==='red'?'sel':''} ${!f.classification&&f.suggestCls==='red'?'suggest':''}" onclick="workSetClassification('red')"><div class="dot"></div>Høj</div>
       </div>
+      <p class="fh-suggest-note">Du vælger selv prioritet. Stiplet kant = vejledende forslag, ikke valgt.</p>
     </div>`;
 
   // ---- STEP 5: Handling (forudvalgt) ----
@@ -2287,7 +2335,7 @@ function renderWorkScreen(){
       <div class="big-step-label">🔧 Handling</div>
       <div class="check-grid">
         ${SKADE_ACTIONS.map(a=>`
-          <div class="check-tile ${f.actions[a.key]?'checked':''}" onclick="workToggleAction('${a.key}')">
+          <div class="check-tile ${f.actions[a.key]?'checked':''} ${!f.actions[a.key]&&f.suggestActions&&f.suggestActions[a.key]?'suggest':''}" onclick="workToggleAction('${a.key}')">
             <div class="box">${f.actions[a.key]?'✓':''}</div>${esc(a.label)}
           </div>`).join('')}
       </div>
@@ -2404,18 +2452,16 @@ function workSetClassification(cls){
   render();
 }
 function workAISuggest(){
+  // RC5.4: kun vejledende forslag (stiplet kant). Intet vælges automatisk — inspektøren vurderer selv.
   const f = state.workForm;
   const checked = SKADE_TYPES.filter(t=>f.types[t.key]);
+  f.suggestCls = null; f.suggestActions = {};
   if(!checked.length) return;
-  // Prioritet: kritiske typer -> Høj (rød), sikkerhedsudstyr -> Middel (gul), kosmetisk -> Lav (grøn) — kun forslag, ændrer ikke et allerede sat valg
-  if(!f.classification){
-    const highTypes = ['stolpe','bjaelke','diagonal','paakorsel','revne','overbelastning','deformation','skaevopstilling','gavl','afstiver'];
-    const mediumTypes = ['vange','fodplade','ankerbolt','sikringssplit','belastningsskilt','beskyttelsesvaern'];
-    if(checked.some(t=>highTypes.includes(t.key))) f.classification='red';
-    else if(checked.some(t=>mediumTypes.includes(t.key))) f.classification='yellow';
-    else f.classification='green';
-  }
-  // Handling: foreslå standardhandling pr. type, men rør ikke allerede afkrydsede
+  const highTypes = ['stolpe','bjaelke','diagonal','paakorsel','revne','overbelastning','deformation','skaevopstilling','gavl','afstiver'];
+  const mediumTypes = ['vange','fodplade','ankerbolt','sikringssplit','belastningsskilt','beskyttelsesvaern'];
+  if(checked.some(t=>highTypes.includes(t.key))) f.suggestCls='red';
+  else if(checked.some(t=>mediumTypes.includes(t.key))) f.suggestCls='yellow';
+  else f.suggestCls='green';
   const suggestAction = {
     stolpe:'reparer', vange:'reparer', bjaelke:'reparer', diagonal:'reparer', fodplade:'reparer',
     ankerbolt:'efterspaend', sikringssplit:'sikringssplit', belastningsskilt:'belastningsskilt',
@@ -2423,10 +2469,7 @@ function workAISuggest(){
     deformation:'udskift', overbelastning:'stopbrug', skaevopstilling:'nykontrol',
     gavl:'reparer', afstiver:'kontaktleverandor', andet:'nykontrol'
   };
-  const hasAnyAction = Object.values(f.actions).some(Boolean);
-  if(!hasAnyAction){
-    checked.forEach(t=>{ const a = suggestAction[t.key]; if(a) f.actions[a]=true; });
-  }
+  checked.forEach(t=>{ const x=suggestAction[t.key]; if(x) f.suggestActions[x]=true; });
 }
 function cancelWorkScreen(){
   state.workForm=null;
@@ -3072,7 +3115,7 @@ function wizardAfslut(insp){
       </div>
     </div>`;
   }
-  const ready = insp.reoler.length>0;
+  const ready = insp.reoler.length>0 && !!insp.vurdering;
   return `
   <div class="panel">
     <h2><span class="num">6</span> Afslut eftersyn</h2>
@@ -3095,7 +3138,7 @@ function wizardAfslut(insp){
       <button class="btn btn-green btn-lg" onclick="finishInspection()" ${ready?'':'disabled'}>✅ Afslut eftersyn og generér rapport</button>
     </div>
     ${!ready?'<p style="font-size:12px;color:var(--red);margin-top:8px">Tilføj mindst én reol i Reolregister før afslutning.</p>':''}
-    ${ready && !insp.vurdering ? '<p style="font-size:12px;color:var(--grey-mid);margin-top:8px">Tip: vælg en samlet vurdering — den vises på rapportens forside, dashboard og kundearkiv.</p>':''}
+    ${insp.reoler.length>0 && !insp.vurdering ? '<p style="font-size:12px;color:var(--red);margin-top:8px">Vælg samlet vurdering for at afslutte — godkendelsen foretages af inspektøren, ikke af ReolScan.</p>':''}
   </div>`;
 }
 function selectVurdering(key){
@@ -3106,16 +3149,13 @@ function selectVurdering(key){
 }
 function finishInspection(){
   const insp = getInspection(state.currentInspectionId);
+  if(!insp.vurdering){ toast('Vælg samlet vurdering — den foretages af inspektøren'); return; }
   const closedCount = DB.inspections.filter(i=>i.status==='closed').length;
   insp.reportNumber = 'RS-'+ (new Date(insp.date)).getFullYear() + '-' + String(closedCount+1).padStart(4,'0');
   const next = new Date(insp.date);
   next.setMonth(next.getMonth()+12);
   insp.nextInspection = next.toISOString().slice(0,10);
   insp.status='closed';
-  if(!insp.vurdering){
-    const counts={green:0,yellow:0,red:0}; insp.skader.forEach(s=>{ if(s.status!=='Lukket') counts[s.classification]++; });
-    insp.vurdering = counts.red>0 ? 'red' : (counts.yellow>0 ? 'yellow' : 'green');
-  }
   prepareReportMail(insp);
   saveDB(DB);
   render();
@@ -4022,7 +4062,7 @@ function renderAdmin(){
     <div class="tile" onclick="state.view='adminLicense';render()">
       <div class="icon">🔑</div>
       <h3>Licens &amp; Version</h3>
-      <p>ReolScan RC5.3 — Reoler A/S.</p>
+      <p>ReolScan RC5.4 — Reoler A/S.</p>
     </div>
   </div>
 
@@ -4038,7 +4078,7 @@ function renderAdminLicense(){
   <div class="panel">
     <img class="license-logo" src="${BRAND.files.light}" alt="Reoler A/S" onerror="this.onerror=null;this.src=brandFallback('logoLight')">
     <div class="formgrid">
-      <div class="field"><label>Version</label><input value="ReolScan RC5.3" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.4" readonly></div>
       <div class="field"><label>Licens</label><input value="Reoler A/S" readonly></div>
     </div>
   </div>
@@ -4278,7 +4318,7 @@ function adminImportFile(e){
 }
 function adminBackupExport(tag){
   try{
-    const out = Object.assign({}, DB, {_backup:{app:'ReolScan', version:'RC5.3', exportedAt:new Date().toISOString(), counts:backupCounts(DB)}});
+    const out = Object.assign({}, DB, {_backup:{app:'ReolScan', version:'RC5.4', exportedAt:new Date().toISOString(), counts:backupCounts(DB)}});
     const dataStr = JSON.stringify(out, null, 2);
     const blob = new Blob([dataStr], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -4384,7 +4424,7 @@ function renderSettings(){
     <h2>Indstillinger</h2>
     <div class="formgrid">
       <div class="field"><label>Standard-inspektør</label><input id="settings_inspector" value="${getInspectorName()}" onchange="setInspectorName(this.value)" placeholder="Dit navn"></div>
-      <div class="field"><label>Version</label><input value="ReolScan RC5.3" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.4" readonly></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="resetDemo()">↺ Nulstil demo-data</button>
@@ -4962,6 +5002,331 @@ function resolveReportDeepLink(){
     }
   }catch(e){}
 }
+</script>
+<script id="fagligScript">
+/* =========================================================
+   RC5.4 — FAGLIG HJÆLP (brochuren "Sikkerhed på lageret", Reoler A/S)
+   Brochuren vises UÆNDRET. Hjælpetekster er kun opslag/støtte —
+   inspektøren vurderer, vælger farve/handling og underskriver selv.
+========================================================= */
+const FAGLIG = {
+  pdfUrl: 'faglig-hjaelp/Sikkerhed-paa-lageret.pdf',
+  dataUrl: 'faglig-hjaelp/brochure-data.js',
+  pdfjsUrl: 'pdfjs/pdf.min.js',
+  workerUrl: 'pdfjs/pdf.worker.min.js',
+  fileName: 'Sikkerhed-paa-lageret.pdf',
+  title: 'Sikkerhed på lageret',
+  pages: 12,
+  // Kontrolpunkter i ReolScan (14) → hvad brochuren siger. Kun brochurens faktiske indhold.
+  help: {
+    stolper:{ t:'Stolper & søjler', pages:[3,4],
+      check:'Alle stigeben skal være intakte og uden deformationer (s. 3).',
+      attention:'Udbøjning. Brochuren viser to illustrationer: stigeben må maks. have en udbøjning på 5 mm, og stigeben (med diagonaler på tegningen) maks. 3 mm (s. 4). Påkørselsskader: se også stigebensbeskyttere (s. 7–8).',
+      method:'Udbøjning måles over 1000 mm (s. 4).' },
+    vanger:{ t:'Vanger', pages:[3,4],
+      check:'Brochuren bruger betegnelsen "stigeben": intakte og uden deformationer (s. 3).',
+      attention:'Samme grænser som stigeben: maks. 5 mm / 3 mm udbøjning (s. 4).',
+      method:'Udbøjning måles over 1000 mm (s. 4).' },
+    diagonaler:{ t:'Diagonaler & bracing', pages:[3,5],
+      check:'Reolens stigegitter skal være intakt og uden deformationer (s. 3).',
+      attention:'Horisontaler og diagonaler må maks. have en nedbøjning på 10 mm (s. 5).',
+      method:'Brochuren angiver grænsen 10 mm på s. 5; måleafstand er ikke angivet for dette punkt.' },
+    bjaelker:{ t:'Bjælker / lastbærende dele', pages:[3,5,6],
+      check:'Alle bærebjælker skal være intakte og uden deformationer (s. 3). Alle bærebjælker skal være sikret med sikringssplitter i begge ender (s. 5).',
+      attention:'Bjælke der bøjer under last, jf. illustrationen "Belastning – Er reolen overbelastet?" (s. 6).',
+      method:'Visuel kontrol. Brochuren angiver ingen målegrænse for bjælker.' },
+    forankring:{ t:'Forankring / fodplader', pages:[3,6],
+      check:'Reolerne skal være korrekt fastgjort til underlag (s. 3). "Alle stigeben er korrekt fastgjort til underlag." (s. 6).',
+      attention:'Se illustrationen af stigeben og ankerbolt på s. 6.',
+      method:'Visuel kontrol. Brochuren angiver ingen momentværdi.' },
+    sikringssplit:{ t:'Sikringssplitter', pages:[3,5],
+      check:'Alle bærebjælker skal være sikret med sikringssplitter (s. 3) — i begge ender (s. 5).',
+      attention:'Kontrollér begge bjælkeender.',
+      method:'Visuel kontrol.' },
+    belastningsskilte:{ t:'Belastningsskilte', pages:[3,6],
+      check:'Reolen skal være udstyret med korrekt vægtangivelse (s. 3).',
+      attention:'Er reolen overbelastet? Se illustration på s. 6.',
+      method:'Sammenhold skiltets angivelse med faktisk brug. Brochuren angiver ingen målemetode.' },
+    paakorselsvaern:{ t:'Påkørselsværn', pages:[3,7,8,9],
+      check:'Alle udsatte stiger skal være sikret med truckværn (s. 3).',
+      attention:'Brochuren viser truckværn (enkelt/dobbelt) og stigebensbeskyttere (s. 7), personværn og fleksible stigebensbeskyttere (s. 8), sikkerhedspullerter og søjlebeskyttelse (s. 9).',
+      method:'Visuel kontrol.' },
+    raekvaerk:{ t:'Rækværk / afspærring', pages:[3,11],
+      check:'Delvis dækning: brochuren omtaler nethylde i køregange/plukkearealer og nedfaldssikring (s. 3, 11).',
+      attention:'Nethylde: max belastning 1000 kg. Nedfaldssikring: rygnet (s. 11).',
+      method:'Visuel kontrol.' },
+    skiltning:{ t:'Skiltning & afmærkning', pages:[3,6],
+      check:'Delvis dækning: brochuren omtaler korrekt vægtangivelse (s. 3).',
+      attention:'Se s. 6 om overbelastning.',
+      method:'Visuel kontrol.' },
+    gangarealer:{ t:'Gangarealer & friplads', pages:[], none:true },
+    belysning:{ t:'Belysning', pages:[], none:true },
+    gulv:{ t:'Gulvbelægning', pages:[], none:true },
+    orden:{ t:'Orden & oprydning', pages:[], none:true }
+  },
+  // Punkter fra brochuren, som ReolScan ikke har som selvstændigt kontrolpunkt (kun opslag — ingen 15. markering)
+  extra:{
+    nedfald:{ t:'Nedfaldssikring', pages:[3,11],
+      check:'Alle fritstående enkeltreoler skal være sikret med nedfaldssikring (s. 3).',
+      attention:'Brochuren viser nedfaldssikring som rygnet (s. 11).', method:'Visuel kontrol.' },
+    nethylde:{ t:'Nethylde', pages:[3,11],
+      check:'Alle køregange samt plukkearealer skal være sikret med nethylde (s. 3).',
+      attention:'Nethylde: max belastning 1000 kg (s. 11).', method:'Visuel kontrol.' },
+    rust:{ t:'Rust / gennemtæring', pages:[3],
+      check:'Reoldele skal være uden kraftig rustangreb eller gennemtæring (s. 3).',
+      attention:'Brochuren giver ingen skala for "kraftig" — det er inspektørens faglige vurdering.', method:'Visuel kontrol.' },
+    dimension:{ t:'Dimensionering / overbelastning', pages:[3,6],
+      check:'Reolen skal være dimensioneret til dens nuværende brug (s. 3). "Er reolen overbelastet?" (s. 6).',
+      attention:'Sammenhold faktisk last med reolens angivne kapacitet.', method:'Brochuren angiver ingen målemetode.' }
+  },
+  // Skadetyper (SKADE_TYPES.key) → hjælpepunkt (kun hvor brochuren har noget relevant)
+  typeMap:{ stolpe:'stolper', deformation:'stolper', vange:'vanger', gavl:'vanger', bjaelke:'bjaelker',
+    diagonal:'diagonaler', afstiver:'diagonaler', fodplade:'forankring', ankerbolt:'forankring',
+    sikringssplit:'sikringssplit', belastningsskilt:'belastningsskilte', beskyttelsesvaern:'paakorselsvaern',
+    paakorsel:'paakorselsvaern', korrosion:'x:rust', overbelastning:'x:dimension' }
+};
+function fhEntry(kind, key){
+  if(kind==='type'){ key = FAGLIG.typeMap[key]; if(!key) return null; }
+  if(key && key.indexOf('x:')===0) return FAGLIG.extra[key.slice(2)] || null;
+  return FAGLIG.help[key] || FAGLIG.extra[key] || null;
+}
+
+/* ---------- Hjælpeark (ⓘ) ---------- */
+function fhHelp(kind, key){
+  const e = fhEntry(kind, key); if(!e) return;
+  fhCloseHelp();
+  const o = document.createElement('div');
+  o.className='modal-overlay'; o.id='fhHelpOverlay';
+  o.onclick = ev=>{ if(ev.target===o) fhCloseHelp(); };
+  const pg = e.pages||[];
+  o.innerHTML = e.none ? `
+    <div class="modal fh-sheet" role="dialog" aria-label="Faglig hjælp">
+      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk">✕</button>
+      <h2>ⓘ ${esc(e.t)}</h2>
+      <p class="fh-none">Dette punkt er ikke omtalt i brochuren "Sikkerhed på lageret". Vurderes af inspektøren.</p>
+    </div>` : `
+    <div class="modal fh-sheet" role="dialog" aria-label="Faglig hjælp">
+      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk">✕</button>
+      <h2>ⓘ ${esc(e.t)}</h2>
+      <div class="fh-sec"><b>Hvad skal kontrolleres</b><p>${esc(e.check)}</p></div>
+      <div class="fh-sec"><b>Vær særligt opmærksom på</b><p>${esc(e.attention)}</p></div>
+      <div class="fh-sec"><b>Målemetode</b><p>${esc(e.method)}</p></div>
+      <div class="fh-sec"><b>Henvisning</b><p>Brochuren "Sikkerhed på lageret", ${pg.length>1?'side ':'side '}${pg.join(', ')}.</p></div>
+      <div class="fh-thumbs" id="fhThumbs">${pg.map(p=>`<button class="fh-thumb" onclick="fhCloseHelp();openBrochure(${p})" aria-label="Åbn side ${p}"><canvas data-fhpage="${p}"></canvas><span>Side ${p}</span></button>`).join('')}</div>
+      <div class="btn-row"><button class="btn btn-primary" onclick="fhCloseHelp();openBrochure(${pg[0]})">📖 Åbn side ${pg[0]} i brochuren</button></div>
+      <p class="fh-disc">Opslag til støtte. Vurdering, farve, handling og godkendelse foretages af den sagkyndige inspektør.</p>
+    </div>`;
+  document.body.appendChild(o);
+  if(!e.none) fhRenderThumbs();
+}
+function fhCloseHelp(){ const o=document.getElementById('fhHelpOverlay'); if(o) o.remove(); }
+async function fhRenderThumbs(){
+  try{
+    const pdf = await fhGetPdf();
+    const cs = document.querySelectorAll('#fhThumbs canvas');
+    for(const c of cs){
+      const page = await pdf.getPage(parseInt(c.dataset.fhpage,10));
+      const vp0 = page.getViewport({scale:1});
+      const scale = 130/vp0.width, dpr = Math.min(window.devicePixelRatio||1,2);
+      const vp = page.getViewport({scale:scale*dpr});
+      c.width = vp.width; c.height = vp.height; c.style.width = (vp.width/dpr)+'px'; c.style.height=(vp.height/dpr)+'px';
+      await page.render({canvasContext:c.getContext('2d'), viewport:vp}).promise;
+    }
+  }catch(e){ const t=document.getElementById('fhThumbs'); if(t) t.style.display='none'; }
+}
+
+/* ---------- PDF-adgang: lokal fil → ellers indlejret kopi (file://) ---------- */
+const FH = { bytes:null, pdf:null, loading:null, scale:1, zoom:1 };
+function fhLoadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('Kunne ikke indlæse '+src)); document.head.appendChild(s);
+  });
+}
+async function fhGetBytes(){
+  if(FH.bytes) return FH.bytes;
+  try{
+    const r = await fetch(FAGLIG.pdfUrl);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    FH.bytes = new Uint8Array(await r.arrayBuffer());
+  }catch(e){
+    if(!window.BROCHURE_B64) await fhLoadScript(FAGLIG.dataUrl);
+    const bin = atob(window.BROCHURE_B64); const u = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+    FH.bytes = u;
+  }
+  return FH.bytes;
+}
+async function fhGetPdf(){
+  if(FH.pdf) return FH.pdf;
+  if(FH.loading) return FH.loading;
+  FH.loading = (async()=>{
+    if(!window.pdfjsLib) await fhLoadScript(FAGLIG.pdfjsUrl);
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = FAGLIG.workerUrl;
+    const bytes = await fhGetBytes();
+    FH.pdf = await window.pdfjsLib.getDocument({data: bytes.slice()}).promise;
+    return FH.pdf;
+  })();
+  try{ return await FH.loading; } finally { FH.loading = null; }
+}
+
+/* ---------- Viser ---------- */
+function openBrochure(page){
+  page = Math.max(1, Math.min(FAGLIG.pages, parseInt(page,10)||1));
+  let v = document.getElementById('fhViewer');
+  if(v){ fhScrollTo(page); return; }
+  v = document.createElement('div');
+  v.id='fhViewer'; v.className='fh-viewer';
+  v.setAttribute('role','dialog'); v.setAttribute('aria-label','Sikkerhed på lageret');
+  v.innerHTML = `
+    <div class="fh-bar">
+      <button class="fh-close" onclick="closeBrochure()" aria-label="Luk brochure">✕ Luk</button>
+      <div class="fh-title">${esc(FAGLIG.title)}</div>
+      <div class="fh-ctl">
+        <button onclick="fhStep(-1)" aria-label="Forrige side">‹</button>
+        <span id="fhPageInd">1 / ${FAGLIG.pages}</span>
+        <button onclick="fhStep(1)" aria-label="Næste side">›</button>
+        <button onclick="fhZoom(-0.25)" aria-label="Zoom ud">−</button>
+        <button onclick="fhZoom(0.25)" aria-label="Zoom ind">+</button>
+        <button class="fh-dl" onclick="downloadBrochure()">⬇ Download PDF</button>
+      </div>
+    </div>
+    <div class="fh-body" id="fhBody"><div class="fh-msg" id="fhMsg">Åbner brochure…</div></div>`;
+  document.body.appendChild(v);
+  document.body.classList.add('fh-open');
+  document.addEventListener('keydown', fhKey);
+  window.addEventListener('resize', fhResizeDebounced);
+  fhBuild(page);
+}
+function closeBrochure(){
+  const v=document.getElementById('fhViewer'); if(v) v.remove();
+  document.body.classList.remove('fh-open');
+  document.removeEventListener('keydown', fhKey);
+  window.removeEventListener('resize', fhResizeDebounced);
+}
+function fhKey(e){
+  if(e.key==='Escape') closeBrochure();
+  else if(e.key==='ArrowRight') fhStep(1);
+  else if(e.key==='ArrowLeft') fhStep(-1);
+}
+let fhRT=null;
+function fhResizeDebounced(){ clearTimeout(fhRT); fhRT=setTimeout(()=>{ const p=fhCurPage(); fhBuild(p); },250); }
+async function fhBuild(startPage){
+  const body = document.getElementById('fhBody'); if(!body) return;
+  try{
+    const pdf = await fhGetPdf();
+    if(!document.getElementById('fhBody')) return;
+    body.innerHTML='';
+    const avail = Math.max(240, body.clientWidth-16);
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const wraps=[];
+    for(let i=1;i<=pdf.numPages;i++){
+      const page = await pdf.getPage(i);
+      const vp0 = page.getViewport({scale:1});
+      const cssScale = (avail/vp0.width)*FH.zoom;
+      const vp = page.getViewport({scale:cssScale*dpr});
+      const w = document.createElement('div'); w.className='fh-page'; w.dataset.page=i;
+      const c = document.createElement('canvas');
+      c.width=vp.width; c.height=vp.height; c.style.width=(vp.width/dpr)+'px'; c.style.height=(vp.height/dpr)+'px';
+      c.setAttribute('aria-label','Side '+i);
+      w.appendChild(c); body.appendChild(w); wraps.push([page,c,vp]);
+      if(i===1) { /* vis første side hurtigt */ }
+    }
+    fhScrollTo(startPage, true);
+    body.onscroll = fhUpdateInd;
+    // Render den ønskede side først, derefter resten
+    const order = wraps.map((x,i)=>i).sort((a,b)=>Math.abs(a-(startPage-1))-Math.abs(b-(startPage-1)));
+    for(const idx of order){
+      if(!document.getElementById('fhBody')) return;
+      const [page,c,vp]=wraps[idx];
+      await page.render({canvasContext:c.getContext('2d'), viewport:vp}).promise;
+    }
+    fhUpdateInd();
+  }catch(e){
+    const m = document.getElementById('fhBody');
+    if(m) m.innerHTML = '<div class="fh-msg">Brochuren kunne ikke vises her ('+esc(e.message||e)+'). Brug "Download PDF" for at åbne den i din PDF-læser.</div>';
+  }
+}
+function fhCurPage(){
+  const body=document.getElementById('fhBody'); if(!body) return 1;
+  const mid = body.scrollTop + body.clientHeight/3; let cur=1;
+  body.querySelectorAll('.fh-page').forEach(p=>{ if(p.offsetTop<=mid) cur=parseInt(p.dataset.page,10); });
+  return cur;
+}
+function fhUpdateInd(){ const el=document.getElementById('fhPageInd'); if(el) el.textContent = fhCurPage()+' / '+FAGLIG.pages; }
+function fhScrollTo(p, instant){
+  const body=document.getElementById('fhBody'); if(!body) return;
+  const el = body.querySelector('.fh-page[data-page="'+p+'"]'); if(!el) return;
+  body.scrollTo({top: el.offsetTop-6, behavior: instant?'auto':'smooth'});
+  const ind=document.getElementById('fhPageInd'); if(ind) ind.textContent = p+' / '+FAGLIG.pages;
+}
+function fhStep(d){ fhScrollTo(Math.max(1,Math.min(FAGLIG.pages, fhCurPage()+d))); }
+function fhZoom(d){ FH.zoom = Math.max(0.5, Math.min(3, FH.zoom+d)); fhBuild(fhCurPage()); }
+async function downloadBrochure(){
+  try{
+    const bytes = await fhGetBytes();
+    const blob = new Blob([bytes], {type:'application/pdf'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = FAGLIG.fileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  }catch(e){ toast('Download mislykkedes'); }
+}
+
+/* ---------- Faglig hjælp-side ---------- */
+function renderFagligHjaelp(){
+  const rows = HOVEDOMRAADER.map(h=>{
+    const e = FAGLIG.help[h.key]; const pg = e && e.pages.length ? 's. '+e.pages.join(', ') : 'ikke omtalt';
+    return `<div class="fh-row"><span>${esc(h.label)}</span><span class="fh-pg">${pg}</span>${e&&!e.none?`<button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button>`:'<span class="fh-i-ph"></span>'}</div>`;
+  }).join('');
+  return `
+  <div class="panel">
+    <h2>📘 Faglig hjælp</h2>
+    <div class="fh-card">
+      <div>
+        <h3>${esc(FAGLIG.title)}</h3>
+        <p>Reoler A/S' brochure om sikkerhed på lageret — fagligt opslagsværk til reoleftersyn. Vises uændret.</p>
+      </div>
+      <div class="btn-row" style="margin:0">
+        <button class="btn btn-primary btn-lg" onclick="openBrochure(1)">📖 Åbn brochure</button>
+        <button class="btn btn-ghost" onclick="downloadBrochure()">⬇ Download PDF</button>
+      </div>
+    </div>
+    <h3 style="margin:20px 0 8px;color:var(--navy);font-size:15px">Kontrolpunkter og brochurens sider</h3>
+    <div class="fh-list">${rows}</div>
+    <h3 style="margin:18px 0 8px;color:var(--navy);font-size:15px">Også i brochuren</h3>
+    <div class="fh-list">${Object.entries(FAGLIG.extra).map(([k,e])=>`<div class="fh-row"><span>${esc(e.t)}</span><span class="fh-pg">s. ${e.pages.join(', ')}</span><button class="fh-i" onclick="fhHelp('ctrl','${k}')" aria-label="Hjælp: ${esc(e.t)}">ⓘ</button></div>`).join('')}</div>
+    <p class="fh-disc">Brochuren er © Reoler A/S og er indlagt uændret. Tegningerne på s. 5–6 er Reoler A/S' ejendom. Hjælpen er opslag — vurdering, farve, handling og godkendelse foretages af den sagkyndige inspektør.</p>
+  </div>`;
+}
+
+/* ---------- Kontrolpunkter-panel (valgfrit, under Skader) ---------- */
+function fhCtrlPanel(insp){
+  const cl = insp.checklist || {};
+  const rows = HOVEDOMRAADER.map(h=>{
+    const e = FAGLIG.help[h.key]; const v = cl[h.key];
+    return `<div class="fh-crow">
+      <span class="fh-cl">${esc(h.label)}</span>
+      ${e&&!e.none?`<button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button>`:'<span class="fh-i-ph"></span>'}
+      <button class="fh-mk ok ${v==='ok'?'sel':''}" onclick="fhMark('${h.key}','ok')" aria-pressed="${v==='ok'}">OK</button>
+      <button class="fh-mk bad ${v==='fejl'?'sel':''}" onclick="fhMark('${h.key}','fejl')" aria-pressed="${v==='fejl'}">Afvigelse</button>
+    </div>`;
+  }).join('');
+  const done = HOVEDOMRAADER.filter(h=>cl[h.key]).length;
+  return `<details class="fh-ctrl" ${state.fhCtrlOpen?'open':''} ontoggle="state.fhCtrlOpen=this.open">
+    <summary>Kontrolpunkter (${HOVEDOMRAADER.length}) <span class="optional-tag">valgfri · ${done} markeret</span></summary>
+    <p class="fh-disc" style="margin:8px 0">Ikke udfyldt som standard. Markering sker kun af inspektøren.</p>
+    ${rows}
+  </details>`;
+}
+function fhMark(key, val){
+  const insp = getInspection(state.currentInspectionId); if(!insp) return;
+  insp.checklist = insp.checklist || {};
+  if(insp.checklist[key]===val) delete insp.checklist[key]; else insp.checklist[key]=val;
+  saveDB(DB); state.fhCtrlOpen = true; const y=window.scrollY; render(); window.scrollTo(0,y);
+}
+
+
+/* Offline-cache (kun http/https) */
+try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}
 </script>
 <script id="brandFallbackScript">
 /* Indlejret reserve-logo – bruges kun hvis filerne i logo/ ikke kan indlæses. Kan ignoreres. */
