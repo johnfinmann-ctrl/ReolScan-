@@ -1,0 +1,31 @@
+PASS · PC ingen vurdering er forvalgt, og konklusionen vises som UDKAST
+PASS · PC udkastet bygger på registreringer og indeholder ikke "godkendt"/"sikker"/"AI" — Eftersynet omfatter 1 reoler og 1 registrerede observationer: 1 røde, 0 gule og 0 grønne (klassificeret af inspektøren).
+PASS · PC "Afslut" er låst uden vurdering og godkendt konklusion
+PASS · PC hjælpetekst opdateres: beder om godkendelse af konklusion
+PASS · PC stadig låst: vurdering valgt men konklusion ikke godkendt
+PASS · PC finishInspection afviser uden godkendt konklusion (status uændret)
+PASS · PC redigering gemmes uden genindlæsning (felt bevarer fokus/indhold)
+PASS · PC inspektøren godkender → status "godkendt af inspektøren", Afslut låses op
+PASS · PC ændring efter godkendelse fjerner godkendelsen igen
+PASS · Eftersyn afsluttes først efter godkendelse
+PASS · PDF: overskrift "Eftersynets konklusion" — "AI Ledelsesresumé" findes ikke
+PASS · PDF: ingen "AI"-mærkning tilbage i rapporten
+PASS · PDF: inspektørens egen tekst og "gennemgået og godkendt af inspektøren"
+PASS · PDF: "Inspektørens samlede vurdering: GODKENDT MED BEMÆRKNINGER" bevaret; ingen automatisk "vurderes godkendt"
+PASS · PDF: ingen ældre auto-formuleringer ("er sikker", "Godkendt — ingen udestående")
+PASS · PDF uden godkendt konklusion: tydelig "UDKAST … ikke gennemgået og godkendt af inspektøren" + "ikke en faglig vurdering"
+PASS · MOBIL ingen vurdering er forvalgt, og konklusionen vises som UDKAST
+PASS · MOBIL udkastet bygger på registreringer og indeholder ikke "godkendt"/"sikker"/"AI" — Eftersynet omfatter 1 reoler og 1 registrerede observationer: 1 røde, 0 gule og 0 grønne (klassificeret af inspektøren).
+PASS · MOBIL "Afslut" er låst uden vurdering og godkendt konklusion
+PASS · MOBIL hjælpetekst opdateres: beder om godkendelse af konklusion
+PASS · MOBIL stadig låst: vurdering valgt men konklusion ikke godkendt
+PASS · MOBIL finishInspection afviser uden godkendt konklusion (status uændret)
+PASS · MOBIL redigering gemmes uden genindlæsning (felt bevarer fokus/indhold)
+PASS · MOBIL inspektøren godkender → status "godkendt af inspektøren", Afslut låses op
+PASS · MOBIL ændring efter godkendelse fjerner godkendelsen igen
+PASS · Ingen JavaScript-fejl
+REGRESSION EFTER RETTELSEN (samme testfotos som før)
+ PDF-størrelse uændret: 10 fotos 1,06 MB / 25 fotos 2,49 MB / 50 fotos 3,77 MB; sider 11 / 22 / 39 (uændret).
+ Interne links (pypdf + pdf.js): 20 / 50 / 100, alle gyldige; hver miniature → rigtig billedside 10/10, 25/25, 50/50; "Tilbage til skaden" 10/10, 25/25, 50/50; ingen eksterne links.
+ Foto/mail-test 102/102 og RC5.5-test (99) uden fejl. Ingen automatisk mailafsendelse; "sendt" kun efter inspektørens bekræftelse (uændret).
+ Ikke testet: Adobe Acrobat, Chrome/Edge/Safari-læsere og mobil (se TESTRESULTAT_KOMPAKT_PDF.txt).

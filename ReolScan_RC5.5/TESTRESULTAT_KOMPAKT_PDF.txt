@@ -1,0 +1,30 @@
+ReolScan RC5.5 – Kompakt PDF med klikbare skadefotos – testresultat
+Miljø: Chromium (Playwright) + jsPDF, poppler (pdfimages/pdftoppm), pypdf, pdf.js. Testfotos: 10/25/50 UNIKKE fotos med 3-4 MB originaler (komprimeret ved optagelse til ca. 265 kB), meget detaljerede (støj) = worst case for filstørrelse. Rigtige fotos giver typisk mindre filer.
+
+FILSTØRRELSE (samlet PDF, inkl. hoveddel, miniaturer og store billeder)
+ Fotos | Før (RC5.5 foto-version, store fotos i hoveddelen) | Nu (kompakt) | Sider nu
+   10  | 1,05 MB                                            | 1,06 MB      | 11
+   25  | 2,46 MB                                            | 2,49 MB      | 22
+   50  | 4,82 MB                                            | 3,77 MB      | 39
+ Ærligt: ved 10 og 25 fotos er filen ikke mindre end før (miniaturer er tilføjet), men hoveddelen er mærkbart kortere/mere overskuelig, og fra >25 fotos skiftes til lavere opløsning (900 px) så 50 fotos fylder ca. 22 % mindre. Ca. 75-100 kB pr. foto i worst case.
+ Indstillinger: store billeder 1000 px / JPEG 0,68 (≤25 fotos), 900 px / 0,60 (>25); miniaturer 200 px / 0,55; ét stort billede + én miniature pr. foto (ikke samme foto flere gange i fuld opløsning).
+
+INTERNE LINKS (pypdf + pdf.js)
+ 10 fotos: 10 miniature→billedside + 10 "Tilbage til skaden" = 20 links, alle gyldige
+ 25 fotos: 50 links, alle gyldige | 50 fotos: 100 links, alle gyldige
+ Hver miniature fører til den RIGTIGE billedside (Foto i af n, skade nr.): 10/10, 25/25, 50/50
+ "Tilbage til skaden" fører til skadens første side: 10/10, 25/25, 50/50
+ Eksterne links/URL i PDF: 0. Alle billeder ligger i filen (ingen login eller eksterne billedlinks).
+ pdf.js (bruges i Firefox og i ReolScans gennemsyn) løser alle 20/50/100 link-mål korrekt.
+
+BILLEDKVALITET (se testbilleder/PDF_fotobilag_store_billeder.png, gengivet 130 dpi): tekst på ca. 5 mm i selve motivet kan stadig læses i det store billede; miniaturer er til overblik.
+
+FOTOSIDER: 2 store billeder pr. side med reolnummer, placering, skadebeskrivelse, risiko, handling, dato, billedtekst og "« Tilbage til skaden (side N)". Fotoregistreringen i appen er uændret.
+
+REGRESSION: Foto/mail-testen (102 kontroller) og RC5.5-testen (99) kørt igen uden fejl. Ingen automatisk mailafsendelse; ingen "sendt"-status uden inspektørens bekræftelse (uændret).
+
+BEGRÆNSNINGER (ikke testet / skal prøves manuelt)
+ - Adobe Acrobat: ikke tilgængelig i testmiljøet. Linkene er standard PDF-GoTo-destinationer (/Dest) som Acrobat understøtter – men prøv selv i Acrobat Reader.
+ - Chrome/Edge/Safari indbyggede PDF-læsere og mobil (iOS Fotos/Filer, Android Chrome/Drive): kunne ikke køres i sandkassen. Kun pdf.js og poppler/pypdf er brugt. Nogle mobile PDF-visere (og mange mail-forhåndsvisninger) understøtter ikke interne links – så kan siderne i stedet scrolles/bladres; indholdet er det samme.
+ - Teksten "Tilbage til skaden" har et sidetal i parentes, så kunden også kan finde skaden uden klik.
+ - Pilen ← findes ikke i PDF-standardskrifttypen; der bruges « i stedet.

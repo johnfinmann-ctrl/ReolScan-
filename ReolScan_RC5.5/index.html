@@ -818,6 +818,11 @@ body.fh-open{overflow:visible}
 .fh-ready{font-size:13px;background:var(--navy-soft);border-radius:8px;padding:8px 10px;margin:6px 0}
 #sd_to.bad{border-color:var(--red);background:#fdecef}
 .send-sheet textarea{width:100%}
+
+.konk-status{font-size:13px;font-weight:700;padding:8px 10px;border-radius:8px;margin:6px 0}
+.konk-status.warn{background:#FFF4D6;color:#8A5A00;border:1px solid #E8C566}
+.konk-status.ok{background:#E3F5EA;color:#1F7A44;border:1px solid #8FD0A8}
+.konk-box textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--grey-light,#cfd6dc);border-radius:8px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -3202,7 +3207,7 @@ function wizardAfslut(insp){
       </div>
     </div>`;
   }
-  const ready = insp.reoler.length>0 && !!insp.vurdering;
+  const ready = insp.reoler.length>0 && !!insp.vurdering && !!(insp.konklusion&&insp.konklusion.approved);
   return `
   <div class="panel">
     <h2><span class="num">6</span> Afslut eftersyn</h2>
@@ -3221,12 +3226,19 @@ function wizardAfslut(insp){
         </div>`).join('')}
     </div>
 
+    <div class="field full konk-box" style="margin-top:18px">
+      <label>Eftersynets konklusion (til rapporten)</label>
+      <div id="konkStatus" class="konk-status ${konkState(insp).approved?'ok':'warn'}">${konkState(insp).approved?'✓ Konklusionen er gennemgået og godkendt af inspektøren.':'UDKAST — genereret ud fra dine registreringer. Gennemgå, ret og godkend den.'}</div>
+      <textarea id="konkText" rows="5" oninput="konkEdit(this.value)">${esc(konkState(insp).text)}</textarea>
+      <button class="btn btn-ghost" id="konkApprove" onclick="konkApprove()" ${konkState(insp).approved?'disabled':''}>${konkState(insp).approved?'✓ Godkendt':'✓ Godkend konklusion'}</button>
+      <p style="font-size:12px;color:var(--grey-mid);margin-top:6px">Konklusionen bygger på dine registreringer og din egen samlede vurdering. ReolScan konkluderer ikke selv, at et reolsystem er sikkert eller godkendt.</p>
+    </div>
+
     <p style="font-size:13px;color:var(--grey-mid);margin-top:14px">Ved afslutning genereres rapportnummer automatisk, næste eftersyn beregnes (+12 måneder), og eftersynet flyttes til <strong>Rapporter</strong>. Ingen data slettes.</p>
     <div class="btn-row">
-      <button class="btn btn-green btn-lg" onclick="finishInspection()" ${ready?'':'disabled'}>✅ Afslut eftersyn og generér rapport</button>
+      <button class="btn btn-green btn-lg" id="finishBtn" onclick="finishInspection()" ${ready?'':'disabled'}>✅ Afslut eftersyn og generér rapport</button>
     </div>
-    ${!ready?'<p style="font-size:12px;color:var(--red);margin-top:8px">Tilføj mindst én reol i Reolregister før afslutning.</p>':''}
-    ${insp.reoler.length>0 && !insp.vurdering ? '<p style="font-size:12px;color:var(--red);margin-top:8px">Vælg samlet vurdering for at afslutte — godkendelsen foretages af inspektøren, ikke af ReolScan.</p>':''}
+    <p id="finishHint" style="font-size:12px;color:var(--red);margin-top:8px">${esc(finishHint(insp))}</p>
   </div>`;
 }
 function selectVurdering(key){
@@ -3234,10 +3246,12 @@ function selectVurdering(key){
   insp.vurdering = key;
   saveDB(DB);
   document.querySelectorAll('#vurderingRow .tagclass').forEach(el=>el.classList.toggle('sel', el.dataset.cls===key));
+  konkRefresh();
 }
 function finishInspection(){
   const insp = getInspection(state.currentInspectionId);
   if(!insp.vurdering){ toast('Vælg samlet vurdering — den foretages af inspektøren'); return; }
+  if(!(insp.konklusion&&insp.konklusion.approved&&insp.konklusion.text)){ toast('Gennemgå og godkend eftersynets konklusion, før du afslutter'); return; }
   const closedCount = DB.inspections.filter(i=>i.status==='closed').length;
   insp.reportNumber = 'RS-'+ (new Date(insp.date)).getFullYear() + '-' + String(closedCount+1).padStart(4,'0');
   const next = new Date(insp.date);
@@ -4026,7 +4040,7 @@ function renderAIPlaceholder(){
       <div class="report-list-item"><div class="info"><h4>AI genkender reoler på tegning</h4><div class="meta">Foreslår pins for reoler og zoner ud fra uploadet tegning.</div></div></div>
       <div class="report-list-item"><div class="info"><h4>AI finder mønstre i skader</h4><div class="meta">Identificerer gentagne fejltyper og lokationer over tid.</div></div></div>
       <div class="report-list-item"><div class="info"><h4>AI foreslår risikoområder</h4><div class="meta">Peger på zoner/reoler med forhøjet skaderisiko.</div></div></div>
-      <div class="report-list-item"><div class="info"><h4>AI genererer ledelsesresume</h4><div class="meta">Kort opsummering af tilstand, status og anbefalinger til ledelsen.</div></div></div>
+      <div class="report-list-item"><div class="info"><h4>Automatisk udkast til konklusion</h4><div class="meta">Regelbaseret udkast ud fra registreringerne — inspektøren gennemgår, retter og godkender.</div></div></div>
     </div>
     <p style="font-size:12px;color:var(--grey-mid);margin-top:14px">Ingen reoler, zoner eller skader oprettes automatisk — brugeren skal altid godkende AI-forslag, før de gemmes.</p>
   </div>`;
@@ -4682,6 +4696,49 @@ function aiAnalyzeInspection(insp){
   return {repeatedDefects, repeatedReoler, riskReoler, topHal, topRaekke, years, trend};
 }
 
+/* ---- Eftersynets konklusion: udkast ud fra registreringer → inspektøren gennemgår, retter og godkender ---- */
+function konklusionDraft(insp){
+  const c={green:0,yellow:0,red:0}; insp.skader.forEach(x=>{ if(c[x.classification]!==undefined) c[x.classification]++; });
+  const cs=ctrlSummary(insp);
+  let nx=insp.nextInspection; if(!nx){ const d=new Date(insp.date); d.setMonth(d.getMonth()+12); nx=d.toISOString().slice(0,10); }
+  return 'Eftersynet omfatter '+insp.reoler.length+' reoler og '+insp.skader.length+' registrerede observationer: '+c.red+' røde, '+c.yellow+' gule og '+c.green+' grønne (klassificeret af inspektøren). '
+    +cs.done+' af '+cs.total+' kontrolpunkter er kontrolleret'+(cs.unc?', '+cs.unc+' er ikke kontrolleret':'')+'. Anbefalet næste eftersyn senest '+fmtDate(nx)+'.';
+}
+function konklusionPdf(insp){
+  const k=insp.konklusion;
+  if(k&&k.approved&&k.text) return {text:k.text, approved:true, at:k.approvedAt};
+  return {text:(k&&k.text)||konklusionDraft(insp), approved:false};
+}
+function konkNote(doc,KP,insp,x,y,w){
+  doc.setFontSize(9);
+  if(KP.approved){ doc.setFont('helvetica','italic'); doc.setTextColor(90,100,110);
+    const t=doc.splitTextToSize('Konklusionen bygger på inspektørens registreringer og egen samlede vurdering og er gennemgået og godkendt af inspektøren'+(insp.inspector?' ('+insp.inspector+')':'')+(KP.at?', '+fmtDate(KP.at):'')+'.',w);
+    doc.text(t,x,y); doc.setTextColor(0,0,0); return t.length*4.5+2; }
+  doc.setFont('helvetica','bold'); doc.setTextColor(180,30,50);
+  const t=doc.splitTextToSize('UDKAST — genereret automatisk ud fra registreringerne og endnu ikke gennemgået og godkendt af inspektøren. Teksten er ikke en faglig vurdering.',w);
+  doc.text(t,x,y); doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); return t.length*4.5+2;
+}
+function konkState(insp){ const k=insp.konklusion; return {text:(k&&k.text!=null)?k.text:konklusionDraft(insp), approved:!!(k&&k.approved)}; }
+function finishHint(insp){
+  if(!insp.reoler.length) return 'Tilføj mindst én reol i Reolregister før afslutning.';
+  if(!insp.vurdering) return 'Vælg samlet vurdering for at afslutte — godkendelsen foretages af inspektøren, ikke af ReolScan.';
+  if(!(insp.konklusion&&insp.konklusion.approved)) return 'Godkend konklusionen for at afslutte — den er et udkast, indtil du har gennemgået den.';
+  return '';
+}
+function konkRefresh(){
+  const insp=getInspection(state.currentInspectionId); if(!insp) return; const k=konkState(insp);
+  const st=document.getElementById('konkStatus'); if(st){ st.className='konk-status '+(k.approved?'ok':'warn'); st.textContent=k.approved?'✓ Konklusionen er gennemgået og godkendt af inspektøren.':'UDKAST — genereret ud fra dine registreringer. Gennemgå, ret og godkend den.'; }
+  const ab=document.getElementById('konkApprove'); if(ab){ ab.disabled=k.approved; ab.textContent=k.approved?'✓ Godkendt':'✓ Godkend konklusion'; }
+  const fh=document.getElementById('finishHint'); if(fh) fh.textContent=finishHint(insp);
+  const fb=document.getElementById('finishBtn'); if(fb) fb.disabled=!(insp.reoler.length>0&&insp.vurdering&&k.approved);
+}
+function konkEdit(v){ const insp=getInspection(state.currentInspectionId); insp.konklusion={text:v,approved:false}; saveDB(DB); konkRefresh(); }
+function konkApprove(){
+  const insp=getInspection(state.currentInspectionId); const ta=document.getElementById('konkText'); const t=((ta&&ta.value)||'').trim();
+  if(!t){ toast('Skriv eller ret konklusionen, før du godkender'); return; }
+  insp.konklusion={text:t,approved:true,approvedAt:new Date().toISOString().slice(0,10)}; saveDB(DB); konkRefresh(); toast('Konklusion godkendt af inspektøren');
+}
+
 function aiManagementSummary(insp){
   const a = aiAnalyzeInspection(insp);
   const counts={green:0,yellow:0,red:0}; insp.skader.forEach(s=>counts[s.classification]++);
@@ -4812,15 +4869,12 @@ function generatePDFSync(inspId, opts){
   doc.setDrawColor(220,225,230); doc.setLineWidth(0.4);
   doc.line(M, y, W-M, y); y+=8;
   doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...navy);
-  doc.text('Konklusion', M, y); y+=8;
+  doc.text('Eftersynets konklusion', M, y); y+=8;
   doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(0,0,0);
-  let conclusion = `Eftersynet omfatter ${insp.reoler.length} reoler og ${insp.skader.length} registrerede observationer. `+
-    `${counts.red} kritisk(e) skade(r) kræver øjeblikkelig handling, ${counts.yellow} skade(r) skal udbedres, og ${counts.green} observation(er) er uden akut handling. `+
-    `Næste eftersyn anbefales senest ${fmtDate(insp.nextInspection)}.`;
-  { const c0=ctrlSummary(insp); if(c0.unc) conclusion += ' '+c0.unc+' af '+c0.total+' kontrolpunkter er ikke kontrolleret.'; }
+  const KP = konklusionPdf(insp); const conclusion = KP.text;
   const lines = doc.splitTextToSize(conclusion, W-2*M);
-  doc.text(lines, M, y);
-  y += lines.length*6 + 10;
+  doc.text(lines, M, y); y += lines.length*6 + 2; y += konkNote(doc,KP,insp,M,y,W-2*M);
+  y += 6;
 
   // Klassifikation badges
   const badge=(label,col,xx)=>{
@@ -4836,21 +4890,24 @@ function generatePDFSync(inspId, opts){
     y+=20;
     const vMap={green:['GODKENDT',colors.green], yellow:['GODKENDT MED BEMÆRKNINGER',colors.yellow], red:['IKKE GODKENDT',colors.red]};
     const vm=vMap[insp.vurdering];
-    doc.setFillColor(...vm[1]); doc.roundedRect(M, y, 120, 13, 2, 2, 'F');
+    doc.setFillColor(...vm[1]); doc.roundedRect(M, y, 150, 13, 2, 2, 'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(11);
-    doc.text('Samlet vurdering: '+vm[0], M+60, y+8.5, {align:'center'});
+    doc.text('Inspektørens samlede vurdering: '+vm[0], M+75, y+8.5, {align:'center'});
     doc.setTextColor(0,0,0); doc.setFont('helvetica','normal');
   }
   footer();
 
-  // --- AI Ledelsesresumé + Tjekliste (afvigelser) ---
+  // --- Eftersynets konklusion + Tjekliste (afvigelser) ---
   doc.addPage(); header();
   doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(...navy);
-  doc.text('AI Ledelsesresumé', M, 32); doc.setTextColor(0,0,0);
+  doc.text('Eftersynets konklusion', M, 32); doc.setTextColor(0,0,0);
   doc.setFont('helvetica','normal'); doc.setFontSize(11);
   let sy=42;
-  const summaryLines = doc.splitTextToSize(aiManagementSummary(insp), W-2*M);
-  doc.text(summaryLines, M, sy); sy += summaryLines.length*6 + 10;
+  { const vl = insp.vurdering ? (VURDERING_META[insp.vurdering].label+' (valgt af inspektøren)') : 'ikke angivet af inspektøren';
+    doc.setFont('helvetica','bold'); doc.text('Inspektørens samlede vurdering: ', M, sy); const w0=doc.getTextWidth('Inspektørens samlede vurdering: ');
+    doc.setFont('helvetica','normal'); doc.text(vl, M+w0, sy); sy+=8; }
+  const summaryLines = doc.splitTextToSize(KP.text, W-2*M);
+  doc.text(summaryLines, M, sy); sy += summaryLines.length*6 + 2; sy += konkNote(doc,KP,insp,M,sy,W-2*M) + 6;
 
   { // RC5.5: komplet kontrolliste med fire tydeligt adskilte statusser
     const cs = ctrlSummary(insp), pts = ctrlPoints(insp), cl = insp.checklist||{};
@@ -4890,7 +4947,7 @@ function generatePDFSync(inspId, opts){
   // AI mønsteranalyse
   const ai = aiAnalyzeInspection(insp);
   sy+=4;
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('AI Mønsteranalyse', M, sy); sy+=8;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Mønsteroversigt (regelbaseret optælling — ikke en faglig vurdering)', M, sy); sy+=8;
   doc.setFont('helvetica','normal'); doc.setFontSize(10);
   const aiLines = [];
   if(ai.repeatedDefects.length) aiLines.push('Gentagne fejl: '+ai.repeatedDefects.slice(0,5).map(([d,c])=>`${d} (${c}×)`).join(', '));
@@ -4945,9 +5002,10 @@ function generatePDFSync(inspId, opts){
     return groups;
   })();
 
+  const PHOTOS=[], LINKS=[]; const tier=fhPdfTier((opts&&opts.imgStats&&opts.imgStats.total)||0);
   skadeGroups.forEach((group,idx)=>{
     const s = group[0]; // fælles felter: reol, lokation, prioritet, foto, kommentar, tale
-    doc.addPage(); header();
+    doc.addPage(); header(); const dmgPage=doc.internal.getNumberOfPages();
     doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(...navy);
     doc.text('Skade '+(idx+1)+' af '+skadeGroups.length, M, 32);
     doc.setTextColor(0,0,0);
@@ -4999,45 +5057,40 @@ function generatePDFSync(inspId, opts){
       doc.text(vnl, M, y); y += vnl.length*6 + 4;
     }
 
-    { // RC5.5: ALLE fotos, ét pr. række med reol, placering, beskrivelse, risiko, handling, dato og billedtekst
+    { // Kompakt PDF: miniaturer (klikbare) — store billeder ligger samlet i Fotobilag bagest i rapporten
       const caps = s.photoCaptions||[];
       const list = [];
       (s.photos||[]).forEach((p,i)=>{ if(p && !/^data:image\/svg/.test(p)) list.push({p, cap:caps[i]||'', after:false}); });
       (s.photosAfter||[]).forEach(p=>{ if(p && !/^data:image\/svg/.test(p)) list.push({p, cap:'', after:true}); });
-      const boxW=72, boxH=54, tx=M+boxW+6, tw=W-M-tx;
-      const hdr = ()=>{ doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...navy); doc.text('Fotodokumentation — skade '+(idx+1)+' (reol '+s.reolId+')', M, y); doc.setTextColor(0,0,0); y+=7; };
+      const hdr = ()=>{ doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...navy); doc.text('Fotos — skade '+(idx+1)+' (reol '+s.reolId+')', M, y); doc.setTextColor(0,0,0); y+=5; };
       if(list.length){
-        if(y+boxH+16>272){ footer(); doc.addPage(); header(); y=32; }
+        const TW=32, TH=24, COLS=5, GAP=(W-2*M-COLS*TW)/(COLS-1), ROWH=TH+9;
+        if(y+ROWH+16>272){ footer(); doc.addPage(); header(); y=32; }
         hdr();
+        doc.setFont('helvetica','italic'); doc.setFontSize(8); doc.setTextColor(90,100,110);
+        doc.text(list.length+' foto'+(list.length===1?'':'s')+' — klik på et miniaturebillede for at se det store foto i Fotobilag bagest i rapporten.', M, y); y+=5;
+        doc.setTextColor(0,0,0);
         list.forEach((x,i)=>{
-          if(y+boxH+4>274){ footer(); doc.addPage(); header(); y=32; hdr(); }
-          const im = (typeof PDFIMG!=='undefined' && PDFIMG.get(x.p)) || null;
-          let drawn=false, iw=boxW, ih=boxH;
-          if(im && !im.fail){
-            const k=Math.min(boxW/im.w, boxH/im.h); iw=im.w*k; ih=im.h*k;
-            try{ doc.addImage(im.data,'JPEG',M,y,iw,ih); drawn=true; }catch(e){}
+          const col=i%COLS;
+          if(col===0 && i>0) y+=ROWH;
+          if(col===0 && y+ROWH>274){ footer(); doc.addPage(); header(); y=32; hdr(); }
+          const tx=M+col*(TW+GAP);
+          const kT=PDFIMG.get(fhImgKey(x.p,'T',tier));
+          let drawn=false;
+          if(kT && !kT.fail){
+            const k=Math.min(TW/kT.w, TH/kT.h), iw=kT.w*k, ih=kT.h*k;
+            try{ doc.addImage(kT.data,'JPEG',tx+(TW-iw)/2,y+(TH-ih)/2,iw,ih); drawn=true; }catch(e){}
           }
-          if(!drawn){
-            doc.setDrawColor(200,60,60); doc.rect(M,y,boxW,boxH); doc.setFontSize(8); doc.setTextColor(200,60,60);
-            doc.text(doc.splitTextToSize('FOTO KUNNE IKKE INDLÆSES I RAPPORTEN',boxW-6), M+3, y+8); doc.setTextColor(0,0,0); doc.setDrawColor(0,0,0);
-          }
-          const lines = [
-            ['Foto '+(i+1)+' af '+list.length+(x.after?' — efter reparation':''), true],
-            ['Reol: '+s.reolId+(s.location?' · '+s.location:''), false],
-            ['Skade: '+fejltyper+(s.desc?' — '+s.desc:''), false],
-            ['Risiko: '+prioritet+' ('+labels[s.classification]+')', false],
-            ['Handling: '+(s.kommentar||'ikke angivet'), false],
-            ['Dato: '+fmtDate(s.date), false]
-          ];
-          if(x.cap) lines.push(['Billedtekst: '+x.cap, 'i']);
-          doc.setFontSize(9); let ty=y+4;
-          lines.forEach(([t,b])=>{
-            doc.setFont('helvetica', b===true?'bold':(b==='i'?'italic':'normal'));
-            const wl=doc.splitTextToSize(t, tw); doc.text(wl, tx, ty); ty+=wl.length*4.2+1;
-          });
-          doc.setFont('helvetica','normal'); doc.setFontSize(11);
-          y += Math.max(ih, boxH, ty-y) + 5;
+          doc.setDrawColor(drawn?190:200, drawn?198:60, drawn?205:60); doc.rect(tx,y,TW,TH); doc.setDrawColor(0,0,0);
+          if(!drawn){ doc.setFontSize(6); doc.setTextColor(200,60,60); doc.text(doc.splitTextToSize('FOTO KUNNE IKKE INDLÆSES',TW-4), tx+2, y+6); doc.setTextColor(0,0,0); }
+          doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(30,90,160);
+          doc.text('Foto '+(i+1)+(x.after?' (efter rep.)':'')+' › stort', tx, y+TH+4);
+          doc.setTextColor(0,0,0);
+          const ph={p:x.p,cap:x.cap,after:x.after,i:i+1,n:list.length,s,dn:idx+1,fejltyper,prioritet,damagePage:dmgPage};
+          PHOTOS.push(ph);
+          LINKS.push({page:doc.internal.getNumberOfPages(),x:tx,y:y,w:TW,h:TH+5,ph});
         });
+        y+=ROWH;
       }
     }
     footer();
@@ -5056,16 +5109,56 @@ function generatePDFSync(inspId, opts){
   doc.line(M,137,M+80,137);
 
   let fy=150;
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Konklusion', M, fy); fy+=8;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Eftersynets konklusion', M, fy); fy+=8;
   doc.setFont('helvetica','normal'); doc.setFontSize(11);
   const fl = doc.splitTextToSize(conclusion, W-2*M);
-  doc.text(fl, M, fy); fy += fl.length*6 + 6;
+  doc.text(fl, M, fy); fy += fl.length*6 + 2; fy += konkNote(doc,KP,insp,M,fy,W-2*M) + 4;
   const overall = insp.vurdering ? (VURDERING_META[insp.vurdering].label+' (vurderet af inspektøren)') : 'Ikke angivet af inspektøren';
-  doc.setFont('helvetica','bold'); doc.text('Samlet vurdering:', M, fy);
-  doc.setFont('helvetica','normal'); doc.text(overall, M+45, fy); fy+=10;
+  doc.setFont('helvetica','bold'); doc.text('Inspektørens samlede vurdering:', M, fy);
+  doc.setFont('helvetica','normal'); doc.text(overall, M+68, fy); fy+=10;
   doc.setFont('helvetica','bold'); doc.text('Anbefalet næste eftersyn:', M, fy);
   doc.setFont('helvetica','normal'); doc.text(fmtDate(insp.nextInspection), M+62, fy);
   footer();
+
+  // --- Fotobilag: samlet billedsektion efter hoveddelen (2 store billeder pr. side) + "Tilbage til skaden" ---
+  const BACK=[];
+  if(PHOTOS.length){
+    const labelsB={green:'GRØN',yellow:'GUL',red:'RØD'};
+    PHOTOS.forEach((ph,k)=>{
+      const slot=k%2;
+      if(slot===0){
+        doc.addPage(); header();
+        doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...navy);
+        doc.text('Fotobilag — store billeder ('+(k+1)+(k+1<PHOTOS.length?'–'+Math.min(k+2,PHOTOS.length):'')+' af '+PHOTOS.length+')', M, 30); doc.setTextColor(0,0,0);
+      }
+      ph.imgPage=doc.internal.getNumberOfPages();
+      const y0=36+slot*122, BW=W-2*M, BH=80;
+      if(slot===1){ doc.setDrawColor(200,205,210); doc.line(M,y0-3,W-M,y0-3); doc.setDrawColor(0,0,0); }
+      const kL=PDFIMG.get(fhImgKey(ph.p,'L',tier));
+      let ih=BH, iw=BW, drawn=false;
+      if(kL && !kL.fail){
+        const kk=Math.min(BW/kL.w,BH/kL.h); iw=kL.w*kk; ih=kL.h*kk;
+        try{ doc.addImage(kL.data,'JPEG',M,y0,iw,ih); drawn=true; }catch(e){}
+      }
+      if(!drawn){ ih=BH; doc.setDrawColor(200,60,60); doc.rect(M,y0,BW,BH); doc.setFontSize(10); doc.setTextColor(200,60,60); doc.text('FOTO KUNNE IKKE INDLÆSES I RAPPORTEN', M+4, y0+10); doc.setTextColor(0,0,0); doc.setDrawColor(0,0,0); }
+      let ty=y0+ih+5; const s2=ph.s;
+      const put=(t,style,maxL)=>{ doc.setFont('helvetica',style||'normal'); doc.setFontSize(9); let wl=doc.splitTextToSize(t,BW); if(maxL&&wl.length>maxL){ wl=wl.slice(0,maxL); wl[maxL-1]=wl[maxL-1].replace(/.{0,3}$/,'…'); } doc.text(wl,M,ty); ty+=wl.length*4.3+0.6; };
+      put('Foto '+ph.i+' af '+ph.n+(ph.after?' — efter reparation':'')+' · skade '+ph.dn+' · Reol: '+s2.reolId+(s2.location?' · '+s2.location:''),'bold',2);
+      put('Skade: '+ph.fejltyper+(s2.desc?' — '+s2.desc:''),'normal',2);
+      put('Risiko: '+ph.prioritet+' ('+labelsB[s2.classification]+')  ·  Dato: '+fmtDate(s2.date),'normal',1);
+      put('Handling: '+(s2.kommentar||'ikke angivet'),'normal',1);
+      if(ph.cap) put('Billedtekst: '+ph.cap,'italic',2);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(30,90,160);
+      const bt='« Tilbage til skaden (side '+ph.damagePage+')';
+      doc.text(bt,M,ty+1);
+      BACK.push({page:ph.imgPage,x:M,y:ty-3,w:doc.getTextWidth(bt)+2,h:6,target:ph.damagePage});
+      doc.setTextColor(0,0,0);
+      if(slot===1||k===PHOTOS.length-1) footer();
+    });
+    LINKS.forEach(l=>{ doc.setPage(l.page); doc.link(l.x,l.y,l.w,l.h,{pageNumber:l.ph.imgPage}); });
+    BACK.forEach(l=>{ doc.setPage(l.page); doc.link(l.x,l.y,l.w,l.h,{pageNumber:l.target}); });
+    doc.setPage(doc.internal.getNumberOfPages());
+  }
 
   finalizePageNumbers();
   const _fn=(insp.reportNumber||'eftersyn')+'_'+insp.customerName.replace(/[^a-z0-9]+/gi,'_')+'.pdf';
@@ -5757,6 +5850,9 @@ function phCardPhotos(group, insp){
 
 /* ---------- billeder i PDF: komprimér store billeder, bevar læsbar kvalitet ---------- */
 const PDFIMG = new Map();
+/* Kompakt PDF: ét stort billede (1000 px, eller 900 px ved >25 fotos) + én lille miniature (200 px) pr. foto. */
+function fhPdfTier(total){ return total>25 ? {id:'s',max:900,q:0.6} : {id:'n',max:1000,q:0.68}; }
+function fhImgKey(p,kind,tier){ return kind+tier.id+'|'+p; }
 function fhRecompress(src, maxDim, q){
   return new Promise(res=>{
     const img=new Image();
@@ -5770,15 +5866,20 @@ function fhRecompress(src, maxDim, q){
   });
 }
 async function fhPrepPdfImages(insp){
-  let fail=0, total=0;
+  let fail=0; const all=[]; const seenG=new Set();
   for(const s of insp.skader){
-    for(const p of [].concat(s.photos||[], s.photosAfter||[])){
-      if(!p||PH(p)) continue; total++;
-      if(!PDFIMG.has(p)){ const r=await fhRecompress(p,1000,0.72); PDFIMG.set(p, r||{fail:true}); }
-      if(PDFIMG.get(p).fail) fail++;
-    }
+    const g=s.groupId||s.id; if(seenG.has(g)) continue; seenG.add(g);
+    for(const p of [].concat(s.photos||[], s.photosAfter||[])){ if(p&&!PH(p)) all.push(p); }
   }
-  return {total, fail};
+  const total=all.length; const tier=fhPdfTier(total); const done=new Set();
+  for(const p of all){
+    if(done.has(p)) continue; done.add(p);
+    const kL=fhImgKey(p,'L',tier), kT=fhImgKey(p,'T',tier);
+    if(!PDFIMG.has(kL)){ const r=await fhRecompress(p,tier.max,tier.q); PDFIMG.set(kL, r||{fail:true}); }
+    if(!PDFIMG.has(kT)){ const r=await fhRecompress(p,200,0.55); PDFIMG.set(kT, r||{fail:true}); }
+    if(PDFIMG.get(kL).fail) fail++;
+  }
+  return {total, fail, tier:tier.id};
 }
 
 /* ---------- generatePDF: forbereder billeder, bygger PDF, gemmer ---------- */

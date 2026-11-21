@@ -1,5 +1,5 @@
 /* ReolScan RC5.5 – offline-cache (kun statiske filer; ingen data). Ny version hentes automatisk. */
-const CACHE='reolscan-rc55-v2';
+const CACHE='reolscan-rc55-v4';
 const FILES=['./','./index.html','./faglig-hjaelp/Sikkerhed-paa-lageret.pdf','./pdfjs/pdf.min.js','./pdfjs/pdf.worker.min.js','./logo/reoler-as-logo-lys-baggrund.png','./logo/reoler-as-logo-moerk-baggrund.png','./logo/reoler-as-logo-original.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(FILES.map(f=>c.add(f).catch(()=>{})))).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});

@@ -62,3 +62,18 @@ Adressesøgning, Ingen tegning, reolregister, QR, fotos/skader, historik, backup
 - Ingen backend → ingen automatisk afsendelse. Metoder: (1) Del PDF via enhedens delingsmenu (mobil/tablet, PDF vedhæftes af e-mail-appen), (2) download PDF + åbn e-mailprogram (mailto – du vedhæfter selv), (3) .eml-mailudkast med PDF indlejret som vedhæftning, (4) kun download.
 - ReolScan påstår aldrig, at PDF er vedhæftet eller sendt. Status bliver kun "sendt (bekræftet af inspektør)", når inspektøren selv trykker bekræft. Tidligere automatisk "sendt"-markering (mailto/autosend) er fjernet.
 - Ingen ny betalt mailtjeneste eller ekstern database.
+
+## RC5.5 – Kompakt PDF med klikbare skadefotos (tilføjet)
+- Hoveddel: ved hver skade vises små miniaturer (5 pr. række) i stedet for store fotos; hver miniature er klikbar og fører til den store billedside.
+- Nyt "Fotobilag" efter hoveddelen: 2 store billeder pr. side med reolnummer, placering, skadebeskrivelse, risiko, handling, dato og billedtekst + link "« Tilbage til skaden (side N)".
+- Kompression: ét stort billede (1000 px, 900 px ved >25 fotos) og én miniature (200 px) pr. foto – samme foto indlejres ikke i fuld opløsning flere gange. Alle billeder ligger i PDF'en; ingen eksterne links.
+- Uændret: fotoregistrering i appen, alle oplysninger og inspektørens vurderinger, mail-flowet (ingen automatisk afsendelse, ingen falsk "sendt").
+- Ulæselige fotos markeres stadig tydeligt ("FOTO KUNNE IKKE INDLÆSES").
+- Se TESTRESULTAT_KOMPAKT_PDF.txt for størrelser (10/25/50 fotos) og begrænsninger.
+
+## RC5.5 – Rettelse af rapportens konklusion
+- "AI Ledelsesresumé" er erstattet af **"Eftersynets konklusion"**. Teksten antyder ikke længere, at AI har vurderet noget; den bygger på inspektørens registreringer og egen samlede vurdering.
+- Ingen automatisk "godkendt/sikker": sætningerne "Eftersynet vurderes samlet godkendt …" er fjernet. Vurderingen vises som "Inspektørens samlede vurdering" (valgt af inspektøren; intet er forvalgt).
+- Konklusionsteksten genereres som **UDKAST** på afslutningsskærmen (kun tal fra registreringerne). Inspektøren kan rette den og skal trykke "Godkend konklusion", før eftersynet kan afsluttes. Ændres teksten bagefter, bortfalder godkendelsen. Rapporten viser "gennemgået og godkendt af inspektøren"; uden godkendelse (fx ældre rapporter) vises tydeligt "UDKAST … ikke gennemgået og godkendt af inspektøren".
+- "AI Mønsteranalyse" hedder nu "Mønsteroversigt (regelbaseret optælling — ikke en faglig vurdering)". Pladsholderen "AI genererer ledelsesresume" under Kommende er omdøbt til "Automatisk udkast til konklusion".
+- Uændret: små klikbare miniaturer, fotobilag, interne links, "Tilbage til skaden", komprimering, alle fotos i én PDF, deling/mail (ingen automatisk afsendelse). Gammel funktion `aiManagementSummary` ligger uændret, men bruges ikke.
