@@ -734,7 +734,7 @@ body.fh-open{overflow:hidden}
 .fh-page{display:inline-block;margin:0 auto 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.4);line-height:0;max-width:none}
 .fh-page canvas{display:block}
 .fh-msg{color:#fff;padding:40px 16px;font-size:15px;line-height:1.5}
-@media (max-width:600px){.fh-bar{gap:6px;padding:6px 8px}.fh-ctl{display:contents}.fh-ctl>*{order:2}.fh-ctl .fh-dl{order:0;margin-left:auto}.fh-title{order:1;flex-basis:100%;height:0;min-width:0;overflow:hidden;margin:0}.fh-ctl button,.fh-close{min-width:44px;min-height:44px;padding:0 10px}#fhPageInd{flex:1}}
+
 .fh-sheet h2{margin-bottom:10px}
 .fh-sec{margin:0 0 10px}.fh-sec b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-2)}
 .fh-sec p{margin:2px 0 0;font-size:14px;line-height:1.45}
@@ -763,6 +763,35 @@ body.fh-open{overflow:hidden}
 .fh-suggest-note{font-size:12px;color:var(--grey-mid);margin:6px 0 0}
 .fh-hint{background:var(--navy-soft);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:13px;display:flex;gap:8px;align-items:center;justify-content:space-between}
 @media print{.fh-viewer,.fh-i,.fh-ctrl{display:none!important}}
+/* ===== RC5.5 ===== */
+body.fh-open{overflow:visible}
+.fh-viewer{overscroll-behavior:contain}
+.fh-body{overscroll-behavior:contain}
+.fh-bar{gap:8px;padding:8px 10px}
+.fh-back{flex:1 1 200px;background:#fff;color:var(--navy);font-weight:700;border:0;border-radius:10px;min-height:48px;font-size:16px;padding:0 14px;text-align:left;cursor:pointer}
+.fh-x,.fh-dl{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:10px;min-width:48px;min-height:48px;padding:0 12px;font-size:17px;cursor:pointer}
+.fh-dl{background:var(--accent);color:var(--navy);border-color:var(--accent);font-weight:700;font-size:14px}
+.fh-ctl{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.fh-ctl button{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:10px;min-width:44px;min-height:44px;font-size:18px;cursor:pointer}
+@media (max-width:700px){.fh-dl-t{display:none}.fh-dl{min-width:48px}.fh-ctl{width:100%;order:5;justify-content:space-between}.fh-bar{padding:6px 8px}#fhPageInd{flex:1;text-align:center}}
+.fh-crow{display:block;padding:10px 0;border-top:1px solid #eef2f7}
+.fh-chead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fh-cl{flex:1;font-size:14px;line-height:1.3}.fh-cl small{display:block;font-size:12px;margin-top:2px}
+.fh-st.unc{color:#9a6c00}.fh-st.ok{color:#1f7a44}.fh-st.fejl{color:#a8233a}.fh-st.ikr{color:var(--grey-mid)}
+.fh-cbtns{display:flex;flex-wrap:wrap;gap:6px}
+.fh-mk{min-height:44px;padding:0 12px;font-size:14px}
+.fh-mk.na.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fh-mk.reg{background:var(--accent);border-color:var(--accent);color:var(--navy);font-weight:700}
+.fh-mk.meas{background:var(--navy-soft)}
+.fh-warn{background:#fff4d6;border-radius:8px;padding:6px 10px;font-size:13px;margin:0 0 10px}
+.fh-info{background:var(--navy-soft);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.4;margin:10px 0}
+.fh-ms{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:13px;padding:4px 0;border-top:1px solid #eef2f7}
+.fh-hrow{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #eef2f7}
+.fh-afslut{border-radius:10px;padding:10px 12px;margin:0 0 14px;background:var(--navy-soft);font-size:14px}
+.fh-afslut.warn{background:#fff4d6}
+.fh-reuse{display:flex;gap:10px;align-items:center;background:var(--navy-soft);border-radius:10px;padding:12px;margin:0 0 14px;font-size:14px;cursor:pointer}
+.fh-reuse input{width:24px;height:24px;flex:none}
+.fh-sheet select,.fh-sheet input,.fh-sheet textarea{font-size:16px}
 </style>
 </head>
 <body>
@@ -1007,6 +1036,11 @@ function loadDB(){
       db.inspections.forEach(i=>{
         if(i.vurdering===undefined) i.vurdering = null;
         if(!i.checklist) i.checklist = {};
+        // RC5.5: RC5.3 genererede en opdigtet tjekliste (13×OK + Diagonaler=afvigelse). Den er aldrig udfyldt af en inspektør → vises som "Ikke kontrolleret"; original gemmes uændret.
+        (function(){ const fab={stolper:'ok',vanger:'ok',diagonaler:'fejl',bjaelker:'ok',forankring:'ok',sikringssplit:'ok',belastningsskilte:'ok',paakorselsvaern:'ok',raekvaerk:'ok',gangarealer:'ok',belysning:'ok',gulv:'ok',skiltning:'ok',orden:'ok'};
+          const ks=Object.keys(i.checklist); if(ks.length===14 && ks.every(k=>i.checklist[k]===fab[k])){ i.checklistAutoRC53=i.checklist; i.checklist={}; } })();
+        if(i.ctrlVersion===undefined) i.ctrlVersion = (i.status==='closed') ? 14 : 18;
+        if(!i.measurements) i.measurements = [];
         i.reoler.forEach(r=>{ if(r.hal===undefined) r.hal=''; if(r.reolraekke===undefined) r.reolraekke=''; });
       });
       return db;
@@ -1236,7 +1270,7 @@ function render(){
     case 'fagligHjaelp': setCrumb('Faglig hjælp'); v.innerHTML = renderFagligHjaelp(); break;
     case 'reportNotFound': setCrumb('Rapport'); v.innerHTML = renderReportNotFound(); break;
   }
-  setTimeout(()=>{ try{ attachAddressSearch('f_address'); attachAddressSearch('w_address'); }catch(e){} },0);
+  setTimeout(()=>{ try{ attachAddressSearch('f_address'); attachAddressSearch('w_address'); }catch(e){} try{ updateReuseRow(); }catch(e){} },0);
 }
 
 function getInspection(id){ return DB.inspections.find(i=>i.id===id); }
@@ -1289,16 +1323,17 @@ function renderNewInspectionForm(){
     ${DB.customers.length ? `
     <div class="field full" style="margin-bottom:14px">
       <label>Vælg eksisterende kunde</label>
-      <select id="f_existingCustomer" onchange="prefillCustomerFields(this.value)" class="big-select">
+      <select id="f_existingCustomer" onchange="prefillCustomerFields(this.value);updateReuseRow()" class="big-select">
         <option value="">— Ny kunde —</option>
         ${favorites.length?`<optgroup label="Favoritter">${favorites.map(c=>`<option value="${esc(c.id)}">★ ${esc(c.name)}</option>`).join('')}</optgroup>`:''}
         <optgroup label="Alle kunder">${others.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</optgroup>
       </select>
     </div>`:''}
+    <label class="fh-reuse" id="reuseRow" style="display:none"><input type="checkbox" id="f_reuse"><span><b id="reuseText"></b><br><small>Valgfrit: genbruger kunde, haller, reolregister, reolnumre og reoltyper. Kontrolliste, vurdering og underskrifter starter tomme. Tidligere eftersyn ændres ikke.</small></span></label>
     <div class="formgrid">
       <div class="field full">
         <label>Virksomhedsnavn</label>
-        <input list="customerList" id="f_name" placeholder="Fx Carletti A/S">
+        <input list="customerList" id="f_name" placeholder="Fx Carletti A/S" oninput="updateReuseRow()">
         <datalist id="customerList">
           ${DB.customers.map(c=>`<option value="${esc(c.name)}">`).join('')}
         </datalist>
@@ -1374,19 +1409,21 @@ function createInspection(){
     inspector:val('f_inspector')||getInspectorName(),
     status:'open', vurdering:null,
     reportNumber:null,
-    nextInspection:null, checklist:{},
+    nextInspection:null, checklist:{}, ctrlVersion:18, measurements:[],
     drawing:null,
     reoler:[],
     skader:[],
     signatures:{inspector:null, customer:null}
   };
+  const _re = fhReuseData(customer.id);
+  if(_re){ insp.reoler = _re.reoler; insp.basedOn = _re.basedOn; }
   DB.inspections.push(insp);
   saveDB(DB);
   state.currentInspectionId = insp.id;
   state.wizardTab='stamdata';
   state.view='wizard';
   render();
-  toast('Eftersyn oprettet — udfyld reolregister og skader');
+  toast(_re ? 'Eftersyn oprettet ud fra seneste ('+_re.reoler.length+' reoler genbrugt) — kontrolliste starter tom' : 'Eftersyn oprettet — udfyld reolregister og skader');
 }
 
 /* =========================================================
@@ -1478,7 +1515,12 @@ const HOVEDOMRAADER = [
   {key:'belysning', label:'Belysning', standard:['Andet']},
   {key:'gulv', label:'Gulvbelægning', standard:['Andet']},
   {key:'skiltning', label:'Skiltning & afmærkning', standard:['Manglende belastningsskilt','Andet']},
-  {key:'orden', label:'Orden & oprydning', standard:['Andet']}
+  {key:'orden', label:'Orden & oprydning', standard:['Andet']},
+  // RC5.5: fire nye selvstændige kontrolpunkter (de 14 ovenfor er uændrede)
+  {key:'nedfald', label:'Nedfaldssikring og rygnet', standard:['Manglende nedfaldssikring']},
+  {key:'nethylde', label:'Nethylder og sikring over gang- og plukkearealer', standard:['Manglende nethylde']},
+  {key:'korrosion', label:'Korrosion, rust og gennemtæring', standard:['Rust/korrosion']},
+  {key:'dimension', label:'Dimensionering og risiko for overbelastning', standard:['Overbelastning']}
 ];
 const WIZARD_TABS = [
   {key:'stamdata', n:1, label:'Stamdata'},
@@ -2106,6 +2148,7 @@ function wizardSkader(insp){
     </div>
     ${insp.skader.length? renderGroupedSkadeCards(insp) : emptyState('📷','Ingen skader registreret','Tryk "Ny skade" for at registrere første skade.')}
     ${fhCtrlPanel(insp)}
+    ${fhHistoryPanel(insp)}
     <div class="btn-row">
       <button class="btn btn-green btn-lg" onclick="startWorkScreen()">📷 Ny skade</button>
       <button class="btn btn-ghost" onclick="openBrochure(1)">📘 Faglig hjælp</button>
@@ -2181,7 +2224,7 @@ function removeSkade(id){
    NY SKADE — ét kontinuerligt arbejdsskærm. Ingen popups, ingen dialoger.
    Foto → Placering → Afkryds → Prioritet → Handling → Tale/Skrift → Gem & Næste.
 ========================================================= */
-function startWorkScreen(prefillReolId){
+function startWorkScreen(prefillReolId, ctrlKey){
   const insp = getInspection(state.currentInspectionId);
   state.workForm = {
     photos: [],
@@ -2192,8 +2235,10 @@ function startWorkScreen(prefillReolId){
     classification: null,
     actions: {}, // key -> true
     desc: '',
-    voiceNote: null
+    voiceNote: null,
+    ctrlKey: ctrlKey||null
   };
+  if(ctrlKey && FAGLIG.ctrlToType[ctrlKey]){ state.workForm.types[FAGLIG.ctrlToType[ctrlKey]]=true; workAISuggest(); }
   voiceState='idle';
   state.voiceTranscript=''; state.voiceAudioData=null; state.voiceSuggestion=null;
   state.view='workScreen';
@@ -2515,7 +2560,8 @@ function saveAndNext(){
       photos,
       photosAfter: [],
       voiceNote: f.voiceNote || null,
-      date: insp.date || todayISO()
+      date: insp.date || todayISO(),
+      controlPoint: f.ctrlKey||null
     });
   });
   saveDB(DB);
@@ -3101,6 +3147,7 @@ function wizardAfslut(insp){
         <div class="yellow"><strong>${counts.yellow}</strong><span>Gul</span></div>
         <div class="red"><strong>${counts.red}</strong><span>Rød</span></div>
       </div>
+      ${(()=>{const c=ctrlSummary(insp);return `<div class="fh-afslut ${c.unc?'warn':''}" style="margin:10px 0">Kontrolliste: ${c.done} af ${c.total} kontrolleret · ${c.unc} ikke kontrolleret</div>`;})()}
       ${vm?`<div class="completion-vurdering pill ${vm.pill}">${vm.emoji} ${vm.label}</div>`:''}
 
       <div class="completion-actions">
@@ -3125,6 +3172,7 @@ function wizardAfslut(insp){
       <div class="stat-card ${insp.signatures.inspector&&insp.signatures.customer?'green':'yellow'}"><div class="n">${insp.signatures.inspector&&insp.signatures.customer?'✓':'!'}</div><div class="l">Underskrifter</div></div>
     </div>
 
+    ${(()=>{const c=ctrlSummary(insp);return `<div class="fh-afslut ${c.unc?'warn':''}">Kontrolliste: <b>${c.done} af ${c.total}</b> kontrolleret · ${c.unc} ikke kontrolleret${c.fejl?' · '+c.fejl+' afvigelse(r)':''}. ${c.unc?'Rapporten viser tydeligt, at disse punkter ikke er kontrolleret. <a href="#" onclick="event.preventDefault();state.fhCtrlOpen=true;setWizardTab(\'skader\')">Åbn kontrolliste</a>':''}</div>`;})()}
     <div class="field full" style="margin-bottom:6px"><label>Samlet vurdering af eftersynet</label></div>
     <div class="tagclass-row" id="vurderingRow" data-selected="${insp.vurdering||''}">
       ${Object.entries(VURDERING_META).map(([key,m])=>`
@@ -4062,7 +4110,7 @@ function renderAdmin(){
     <div class="tile" onclick="state.view='adminLicense';render()">
       <div class="icon">🔑</div>
       <h3>Licens &amp; Version</h3>
-      <p>ReolScan RC5.4 — Reoler A/S.</p>
+      <p>ReolScan RC5.5 — Reoler A/S.</p>
     </div>
   </div>
 
@@ -4078,7 +4126,7 @@ function renderAdminLicense(){
   <div class="panel">
     <img class="license-logo" src="${BRAND.files.light}" alt="Reoler A/S" onerror="this.onerror=null;this.src=brandFallback('logoLight')">
     <div class="formgrid">
-      <div class="field"><label>Version</label><input value="ReolScan RC5.4" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.5" readonly></div>
       <div class="field"><label>Licens</label><input value="Reoler A/S" readonly></div>
     </div>
   </div>
@@ -4318,7 +4366,7 @@ function adminImportFile(e){
 }
 function adminBackupExport(tag){
   try{
-    const out = Object.assign({}, DB, {_backup:{app:'ReolScan', version:'RC5.4', exportedAt:new Date().toISOString(), counts:backupCounts(DB)}});
+    const out = Object.assign({}, DB, {_backup:{app:'ReolScan', version:'RC5.5', exportedAt:new Date().toISOString(), counts:backupCounts(DB)}});
     const dataStr = JSON.stringify(out, null, 2);
     const blob = new Blob([dataStr], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -4424,7 +4472,7 @@ function renderSettings(){
     <h2>Indstillinger</h2>
     <div class="formgrid">
       <div class="field"><label>Standard-inspektør</label><input id="settings_inspector" value="${getInspectorName()}" onchange="setInspectorName(this.value)" placeholder="Dit navn"></div>
-      <div class="field"><label>Version</label><input value="ReolScan RC5.4" readonly></div>
+      <div class="field"><label>Version</label><input value="ReolScan RC5.5" readonly></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="resetDemo()">↺ Nulstil demo-data</button>
@@ -4740,9 +4788,10 @@ function generatePDF(inspId){
   doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...navy);
   doc.text('Konklusion', M, y); y+=8;
   doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(0,0,0);
-  const conclusion = `Eftersynet omfatter ${insp.reoler.length} reoler og ${insp.skader.length} registrerede observationer. `+
+  let conclusion = `Eftersynet omfatter ${insp.reoler.length} reoler og ${insp.skader.length} registrerede observationer. `+
     `${counts.red} kritisk(e) skade(r) kræver øjeblikkelig handling, ${counts.yellow} skade(r) skal udbedres, og ${counts.green} observation(er) er uden akut handling. `+
     `Næste eftersyn anbefales senest ${fmtDate(insp.nextInspection)}.`;
+  { const c0=ctrlSummary(insp); if(c0.unc) conclusion += ' '+c0.unc+' af '+c0.total+' kontrolpunkter er ikke kontrolleret.'; }
   const lines = doc.splitTextToSize(conclusion, W-2*M);
   doc.text(lines, M, y);
   y += lines.length*6 + 10;
@@ -4777,18 +4826,39 @@ function generatePDF(inspId){
   const summaryLines = doc.splitTextToSize(aiManagementSummary(insp), W-2*M);
   doc.text(summaryLines, M, sy); sy += summaryLines.length*6 + 10;
 
-  const checklistDeviations = HOVEDOMRAADER.filter(h=>(insp.checklist||{})[h.key]==='fejl');
-  if(checklistDeviations.length){
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Tjekliste — afvigelser ('+checklistDeviations.length+' af '+HOVEDOMRAADER.length+' hovedområder)', M, sy); sy+=8;
+  { // RC5.5: komplet kontrolliste med fire tydeligt adskilte statusser
+    const cs = ctrlSummary(insp), pts = ctrlPoints(insp), cl = insp.checklist||{};
+    const need = n=>{ if(sy+n>278){ doc.addPage(); header(); sy=32; } };
+    need(40);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Kontrolliste ('+cs.total+' kontrolpunkter)', M, sy); sy+=7;
     doc.setFont('helvetica','normal'); doc.setFontSize(10);
-    checklistDeviations.forEach(h=>{
-      doc.text('• '+h.label, M, sy); sy+=6;
+    const sl = doc.splitTextToSize('Kontrolleret og OK: '+cs.ok+'  ·  Registreret afvigelse: '+cs.fejl+'  ·  Ikke relevant: '+cs.ikr+'  ·  Ikke kontrolleret: '+cs.unc, W-2*M);
+    doc.text(sl, M, sy); sy += sl.length*5+3;
+    const COL = {ok:[31,122,68], fejl:[168,35,58], ikr:[110,120,130], unc:[154,108,0]};
+    const TXT = {ok:'Kontrolleret og OK', fejl:'Registreret afvigelse', ikr:'Ikke relevant', unc:'IKKE KONTROLLERET'};
+    pts.forEach(h=>{
+      need(7); const v = cl[h.key]==='ok'||cl[h.key]==='fejl'||cl[h.key]==='ikr' ? cl[h.key] : 'unc';
+      doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); doc.text(h.label, M, sy);
+      doc.setTextColor(...COL[v]); doc.setFont('helvetica','bold'); doc.text(TXT[v], M+110, sy);
+      sy += 6;
     });
-    sy+=4;
-  } else {
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Tjekliste', M, sy); sy+=8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(10);
-    doc.text('Alle 14 hovedområder er godkendt uden afvigelser.', M, sy); sy+=8;
+    doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); sy += 2;
+    if(cs.unc>0){
+      need(14); doc.setFont('helvetica','bold'); doc.setTextColor(...COL.unc);
+      const nl = doc.splitTextToSize('Bemærk: '+cs.unc+' af '+cs.total+' kontrolpunkter er ikke kontrolleret og er derfor ikke vurderet i dette eftersyn.', W-2*M);
+      doc.text(nl, M, sy); sy += nl.length*5+4; doc.setTextColor(0,0,0); doc.setFont('helvetica','normal');
+    }
+    const ms = insp.measurements||[];
+    if(ms.length){
+      need(20); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Målinger ('+ms.length+')', M, sy); sy+=7;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      ms.forEach(x=>{
+        const t = '• '+fhLabel(x.ctrlKey)+': '+x.valueMm+' mm'+(x.reolId?' · reol '+x.reolId:'')+(x.direction?' · '+x.direction:'')+(x.limitMm!=null?' · vejledende grænse '+x.limitMm+' mm (brochure s. '+x.limitPage+')':'')+(x.comment?' · '+x.comment:'');
+        const ml = doc.splitTextToSize(t, W-2*M); need(ml.length*5+2); doc.text(ml, M, sy); sy += ml.length*5+1;
+      });
+      need(12); const nn = doc.splitTextToSize('Målinger er registreret af inspektøren og er ikke i sig selv en godkendelse.', W-2*M);
+      doc.setTextColor(110,120,130); doc.text(nn, M, sy); sy += nn.length*5+4; doc.setTextColor(0,0,0);
+    }
   }
 
   // AI mønsteranalyse
@@ -4936,7 +5006,7 @@ function generatePDF(inspId){
   doc.setFont('helvetica','normal'); doc.setFontSize(11);
   const fl = doc.splitTextToSize(conclusion, W-2*M);
   doc.text(fl, M, fy); fy += fl.length*6 + 6;
-  const overall = counts.red>0 ? 'Kræver opfølgning — kritiske skader skal udbedres.' : (counts.yellow>0 ? 'Tilfredsstillende — mindre udbedringer planlagt.' : 'Godkendt — ingen udestående skader.');
+  const overall = insp.vurdering ? (VURDERING_META[insp.vurdering].label+' (vurderet af inspektøren)') : 'Ikke angivet af inspektøren';
   doc.setFont('helvetica','bold'); doc.text('Samlet vurdering:', M, fy);
   doc.setFont('helvetica','normal'); doc.text(overall, M+45, fy); fy+=10;
   doc.setFont('helvetica','bold'); doc.text('Anbefalet næste eftersyn:', M, fy);
@@ -5005,9 +5075,9 @@ function resolveReportDeepLink(){
 </script>
 <script id="fagligScript">
 /* =========================================================
-   RC5.4 — FAGLIG HJÆLP (brochuren "Sikkerhed på lageret", Reoler A/S)
-   Brochuren vises UÆNDRET. Hjælpetekster er kun opslag/støtte —
-   inspektøren vurderer, vælger farve/handling og underskriver selv.
+   RC5.5 — FAGLIG ASSISTENT (brochuren "Sikkerhed på lageret", Reoler A/S)
+   Brochuren vises UÆNDRET. Alt her er opslag/støtte — inspektøren vurderer,
+   vælger farve/handling, godkender og underskriver selv. Intet sættes automatisk.
 ========================================================= */
 const FAGLIG = {
   pdfUrl: 'faglig-hjaelp/Sikkerhed-paa-lageret.pdf',
@@ -5017,103 +5087,159 @@ const FAGLIG = {
   fileName: 'Sikkerhed-paa-lageret.pdf',
   title: 'Sikkerhed på lageret',
   pages: 12,
-  // Kontrolpunkter i ReolScan (14) → hvad brochuren siger. Kun brochurens faktiske indhold.
+  NB: 'Ikke beskrevet i brochuren',
+  // 18 kontrolpunkter → kun brochurens faktiske udsagn (side i parentes). Ingen opfundne grænser.
   help: {
-    stolper:{ t:'Stolper & søjler', pages:[3,4],
+    stolper:{ pages:[3,4], measure:true,
       check:'Alle stigeben skal være intakte og uden deformationer (s. 3).',
-      attention:'Udbøjning. Brochuren viser to illustrationer: stigeben må maks. have en udbøjning på 5 mm, og stigeben (med diagonaler på tegningen) maks. 3 mm (s. 4). Påkørselsskader: se også stigebensbeskyttere (s. 7–8).',
-      method:'Udbøjning måles over 1000 mm (s. 4).' },
-    vanger:{ t:'Vanger', pages:[3,4],
+      how:'Udbøjning måles over 1000 mm (s. 4). Ellers visuel kontrol.',
+      faults:'Deformation/udbøjning. Brochuren nævner påkørsler som typisk risiko (s. 2).',
+      photo:'Foto af stigebenet og af målingen. Måling: udbøjning i mm over 1000 mm.',
+      limit:'Brochuren viser to illustrationer: maks. 5 mm og maks. 3 mm udbøjning, målt over 1000 mm (s. 4).' },
+    vanger:{ pages:[3,4], measure:true,
       check:'Brochuren bruger betegnelsen "stigeben": intakte og uden deformationer (s. 3).',
-      attention:'Samme grænser som stigeben: maks. 5 mm / 3 mm udbøjning (s. 4).',
-      method:'Udbøjning måles over 1000 mm (s. 4).' },
-    diagonaler:{ t:'Diagonaler & bracing', pages:[3,5],
+      how:'Udbøjning måles over 1000 mm (s. 4). Ellers visuel kontrol.',
+      faults:'Deformation/udbøjning. Påkørsler (s. 2).',
+      photo:'Foto af skaden og af målingen.',
+      limit:'Samme to grænser som stigeben: maks. 5 mm / 3 mm over 1000 mm (s. 4).' },
+    diagonaler:{ pages:[3,5], measure:true,
       check:'Reolens stigegitter skal være intakt og uden deformationer (s. 3).',
-      attention:'Horisontaler og diagonaler må maks. have en nedbøjning på 10 mm (s. 5).',
-      method:'Brochuren angiver grænsen 10 mm på s. 5; måleafstand er ikke angivet for dette punkt.' },
-    bjaelker:{ t:'Bjælker / lastbærende dele', pages:[3,5,6],
-      check:'Alle bærebjælker skal være intakte og uden deformationer (s. 3). Alle bærebjælker skal være sikret med sikringssplitter i begge ender (s. 5).',
-      attention:'Bjælke der bøjer under last, jf. illustrationen "Belastning – Er reolen overbelastet?" (s. 6).',
-      method:'Visuel kontrol. Brochuren angiver ingen målegrænse for bjælker.' },
-    forankring:{ t:'Forankring / fodplader', pages:[3,6],
+      how:'Brochuren angiver nedbøjning (s. 5), men ikke måleafstand. Ellers visuel kontrol.',
+      faults:'Deformation og nedbøjning af horisontaler og diagonaler.',
+      photo:'Foto af diagonalen/horisontalen og af målingen.',
+      limit:'Horisontaler og diagonaler må maks. have en nedbøjning på 10 mm (s. 5).' },
+    bjaelker:{ pages:[3,5,6],
+      check:'Alle bærebjælker skal være intakte og uden deformationer (s. 3), og sikret med sikringssplitter i begge ender (s. 5).',
+      how:'Visuel kontrol. Brochuren angiver ingen målegrænse for bjælker.',
+      faults:'Deformation; manglende sikringssplitter; bjælke der bøjer under last (illustration s. 6).',
+      photo:'Foto af bjælkens ender og af eventuel nedbøjning.', limit:'' },
+    forankring:{ pages:[3,6],
       check:'Reolerne skal være korrekt fastgjort til underlag (s. 3). "Alle stigeben er korrekt fastgjort til underlag." (s. 6).',
-      attention:'Se illustrationen af stigeben og ankerbolt på s. 6.',
-      method:'Visuel kontrol. Brochuren angiver ingen momentværdi.' },
-    sikringssplit:{ t:'Sikringssplitter', pages:[3,5],
+      how:'Visuel kontrol; se illustration af stigeben og ankerbolt (s. 6). Ingen momentværdi i brochuren.',
+      faults:'Manglende eller ikke korrekt fastgjort stigeben.',
+      photo:'Foto af fod/forankring.', limit:'' },
+    sikringssplit:{ pages:[3,5],
       check:'Alle bærebjælker skal være sikret med sikringssplitter (s. 3) — i begge ender (s. 5).',
-      attention:'Kontrollér begge bjælkeender.',
-      method:'Visuel kontrol.' },
-    belastningsskilte:{ t:'Belastningsskilte', pages:[3,6],
+      how:'Visuel kontrol af begge bjælkeender.',
+      faults:'Splitter mangler i den ene eller begge ender.',
+      photo:'Foto af bjælkeende uden splitter.', limit:'' },
+    belastningsskilte:{ pages:[3,6],
       check:'Reolen skal være udstyret med korrekt vægtangivelse (s. 3).',
-      attention:'Er reolen overbelastet? Se illustration på s. 6.',
-      method:'Sammenhold skiltets angivelse med faktisk brug. Brochuren angiver ingen målemetode.' },
-    paakorselsvaern:{ t:'Påkørselsværn', pages:[3,7,8,9],
+      how:'Sammenhold skiltets angivelse med den faktiske brug. Ingen målemetode i brochuren.',
+      faults:'Vægtangivelse mangler eller er ikke korrekt. Se også "Er reolen overbelastet?" (s. 6).',
+      photo:'Foto af skiltet (eller af stedet hvor det mangler).', limit:'' },
+    paakorselsvaern:{ pages:[3,7,8,9],
       check:'Alle udsatte stiger skal være sikret med truckværn (s. 3).',
-      attention:'Brochuren viser truckværn (enkelt/dobbelt) og stigebensbeskyttere (s. 7), personværn og fleksible stigebensbeskyttere (s. 8), sikkerhedspullerter og søjlebeskyttelse (s. 9).',
-      method:'Visuel kontrol.' },
-    raekvaerk:{ t:'Rækværk / afspærring', pages:[3,11],
-      check:'Delvis dækning: brochuren omtaler nethylde i køregange/plukkearealer og nedfaldssikring (s. 3, 11).',
-      attention:'Nethylde: max belastning 1000 kg. Nedfaldssikring: rygnet (s. 11).',
-      method:'Visuel kontrol.' },
-    skiltning:{ t:'Skiltning & afmærkning', pages:[3,6],
-      check:'Delvis dækning: brochuren omtaler korrekt vægtangivelse (s. 3).',
-      attention:'Se s. 6 om overbelastning.',
-      method:'Visuel kontrol.' },
-    gangarealer:{ t:'Gangarealer & friplads', pages:[], none:true },
-    belysning:{ t:'Belysning', pages:[], none:true },
-    gulv:{ t:'Gulvbelægning', pages:[], none:true },
-    orden:{ t:'Orden & oprydning', pages:[], none:true }
-  },
-  // Punkter fra brochuren, som ReolScan ikke har som selvstændigt kontrolpunkt (kun opslag — ingen 15. markering)
-  extra:{
-    nedfald:{ t:'Nedfaldssikring', pages:[3,11],
+      how:'Visuel kontrol. Brochuren viser truckværn (s. 7), personværn og stigebensbeskyttere (s. 8), sikkerhedspullerter og søjlebeskyttelse (s. 9).',
+      faults:'Udsat stige uden truckværn; påkørselsskade på stige eller værn.',
+      photo:'Foto af udsat stige og værn.', limit:'' },
+    raekvaerk:{ pages:[3,11], partial:true,
+      check:'Delvis dækning: brochuren omtaler nethylde i køregange/plukkearealer og nedfaldssikring (s. 3, 11). Selve "rækværk/afspærring" er ikke beskrevet som eget punkt.',
+      how:'Visuel kontrol.',
+      faults:'Se nethylder og nedfaldssikring.',
+      photo:'Foto af afspærringen.', limit:'' },
+    skiltning:{ pages:[3,6], partial:true,
+      check:'Delvis dækning: brochuren omtaler kun korrekt vægtangivelse (s. 3).',
+      how:'Visuel kontrol.',
+      faults:'Vægtangivelse mangler eller er forkert (s. 3).',
+      photo:'Foto af skilt/afmærkning.', limit:'' },
+    nedfald:{ pages:[3,11],
       check:'Alle fritstående enkeltreoler skal være sikret med nedfaldssikring (s. 3).',
-      attention:'Brochuren viser nedfaldssikring som rygnet (s. 11).', method:'Visuel kontrol.' },
-    nethylde:{ t:'Nethylde', pages:[3,11],
+      how:'Visuel kontrol. Brochuren viser nedfaldssikring som rygnet (s. 11).',
+      faults:'Fritstående enkeltreol uden nedfaldssikring/rygnet.',
+      photo:'Foto af reolens bagside/rygnet.', limit:'' },
+    nethylde:{ pages:[3,11],
       check:'Alle køregange samt plukkearealer skal være sikret med nethylde (s. 3).',
-      attention:'Nethylde: max belastning 1000 kg (s. 11).', method:'Visuel kontrol.' },
-    rust:{ t:'Rust / gennemtæring', pages:[3],
+      how:'Visuel kontrol. Brochuren angiver for nethylde: max belastning 1000 kg (s. 11).',
+      faults:'Køregang/plukkeareal uden nethylde.',
+      photo:'Foto af nethylden eller af stedet hvor den mangler.',
+      limit:'Nethylde: max belastning 1000 kg (s. 11).' },
+    korrosion:{ pages:[3],
       check:'Reoldele skal være uden kraftig rustangreb eller gennemtæring (s. 3).',
-      attention:'Brochuren giver ingen skala for "kraftig" — det er inspektørens faglige vurdering.', method:'Visuel kontrol.' },
-    dimension:{ t:'Dimensionering / overbelastning', pages:[3,6],
+      how:'Visuel kontrol. Brochuren giver ingen skala for "kraftig" — det er inspektørens faglige vurdering.',
+      faults:'Kraftigt rustangreb; gennemtæring.',
+      photo:'Nærbillede af rustangrebet med målestok.', limit:'' },
+    dimension:{ pages:[3,6],
       check:'Reolen skal være dimensioneret til dens nuværende brug (s. 3). "Er reolen overbelastet?" (s. 6).',
-      attention:'Sammenhold faktisk last med reolens angivne kapacitet.', method:'Brochuren angiver ingen målemetode.' }
+      how:'Sammenhold faktisk last og brug med reolens angivne kapacitet. Ingen målemetode i brochuren.',
+      faults:'Overbelastning, fx bjælke der bøjer under last (illustration s. 6).',
+      photo:'Foto af lastsituationen og af skiltet.', limit:'' },
+    gangarealer:{ pages:[], none:true }, belysning:{ pages:[], none:true },
+    gulv:{ pages:[], none:true }, orden:{ pages:[], none:true }
   },
-  // Skadetyper (SKADE_TYPES.key) → hjælpepunkt (kun hvor brochuren har noget relevant)
+  // Målekrav fra brochuren. Grænsen vises kun når inspektøren har valgt den matchende konstruktion/målesituation.
+  measure: {
+    stolper:{ title:'Stigeben – udbøjning', pages:[4], needLen:1000,
+      method:'Udbøjning måles over 1000 mm (s. 4).',
+      cons:[{k:'a', label:'Som øverste tegning, s. 4 (stigeben uden diagonaler på tegningen)', limit:5},
+            {k:'b', label:'Som nederste tegning, s. 4 (stigeben med diagonaler på tegningen)', limit:3}] },
+    vanger:{ title:'Stigeben/vanger – udbøjning', pages:[4], needLen:1000,
+      method:'Udbøjning måles over 1000 mm (s. 4).',
+      cons:[{k:'a', label:'Som øverste tegning, s. 4 (stigeben uden diagonaler på tegningen)', limit:5},
+            {k:'b', label:'Som nederste tegning, s. 4 (stigeben med diagonaler på tegningen)', limit:3}] },
+    diagonaler:{ title:'Horisontaler / diagonaler – nedbøjning', pages:[5], needLen:0,
+      method:'Brochuren angiver maks. nedbøjning (s. 5); måleafstand er ikke angivet.',
+      cons:[{k:'h', label:'Horisontal (s. 5)', limit:10},{k:'d', label:'Diagonal (s. 5)', limit:10}] }
+  },
+  dirs:['Mod gang','Væk fra gang','Langs reolen','Lodret','Andet (se kommentar)'],
   typeMap:{ stolpe:'stolper', deformation:'stolper', vange:'vanger', gavl:'vanger', bjaelke:'bjaelker',
     diagonal:'diagonaler', afstiver:'diagonaler', fodplade:'forankring', ankerbolt:'forankring',
     sikringssplit:'sikringssplit', belastningsskilt:'belastningsskilte', beskyttelsesvaern:'paakorselsvaern',
-    paakorsel:'paakorselsvaern', korrosion:'x:rust', overbelastning:'x:dimension' }
+    paakorsel:'paakorselsvaern', korrosion:'korrosion', overbelastning:'dimension' },
+  // Afvigelse → forvalgt skadetype (kun forvalg af typen; omfang, risikoklasse og handling vælger inspektøren)
+  ctrlToType:{ stolper:'stolpe', vanger:'vange', diagonaler:'diagonal', bjaelker:'bjaelke', forankring:'fodplade',
+    sikringssplit:'sikringssplit', belastningsskilte:'belastningsskilt', paakorselsvaern:'beskyttelsesvaern',
+    raekvaerk:'beskyttelsesvaern', skiltning:'belastningsskilt', nedfald:'beskyttelsesvaern', nethylde:'beskyttelsesvaern',
+    korrosion:'korrosion', dimension:'overbelastning', gangarealer:'andet', belysning:'andet', gulv:'andet', orden:'andet' }
 };
+const FH_STATUS = { ok:'OK', fejl:'Afvigelse', ikr:'Ikke relevant' };
+function fhLabel(key){ const h=HOVEDOMRAADER.find(x=>x.key===key); return h?h.label:key; }
 function fhEntry(kind, key){
   if(kind==='type'){ key = FAGLIG.typeMap[key]; if(!key) return null; }
-  if(key && key.indexOf('x:')===0) return FAGLIG.extra[key.slice(2)] || null;
-  return FAGLIG.help[key] || FAGLIG.extra[key] || null;
+  return FAGLIG.help[key] ? Object.assign({key}, FAGLIG.help[key]) : null;
 }
 
-/* ---------- Hjælpeark (ⓘ) ---------- */
+/* ---------- Kontrolliste: punkter og status (Ikke kontrolleret = standard) ---------- */
+function ctrlPoints(insp){ return insp && (insp.ctrlVersion===14 || (insp.ctrlVersion===undefined && insp.status==='closed')) ? HOVEDOMRAADER.slice(0,14) : HOVEDOMRAADER; }
+function ctrlSummary(insp){
+  const cl=(insp&&insp.checklist)||{}; const pts=ctrlPoints(insp);
+  const s={ok:0,fejl:0,ikr:0,unc:0,total:pts.length};
+  pts.forEach(h=>{ const v=cl[h.key]; if(v==='ok')s.ok++; else if(v==='fejl')s.fejl++; else if(v==='ikr')s.ikr++; else s.unc++; });
+  s.done=s.total-s.unc; return s;
+}
+
+/* ---------- Hjælpeark (ⓘ) — overlay, rører ikke eftersynet bagved ---------- */
 function fhHelp(kind, key){
   const e = fhEntry(kind, key); if(!e) return;
   fhCloseHelp();
   const o = document.createElement('div');
   o.className='modal-overlay'; o.id='fhHelpOverlay';
   o.onclick = ev=>{ if(ev.target===o) fhCloseHelp(); };
-  const pg = e.pages||[];
+  const pg = e.pages||[], title = fhLabel(e.key);
+  const canMeasure = !!FAGLIG.measure[e.key] && !!getInspection(state.currentInspectionId);
   o.innerHTML = e.none ? `
     <div class="modal fh-sheet" role="dialog" aria-label="Faglig hjælp">
-      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk">✕</button>
-      <h2>ⓘ ${esc(e.t)}</h2>
-      <p class="fh-none">Dette punkt er ikke omtalt i brochuren "Sikkerhed på lageret". Vurderes af inspektøren.</p>
+      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk hjælp">✕</button>
+      <h2>ⓘ ${esc(title)}</h2>
+      <p class="fh-none"><b>${FAGLIG.NB}.</b> Brochuren "Sikkerhed på lageret" omtaler ikke dette punkt, og ReolScan opfinder ingen krav. Punktet vurderes af inspektøren.</p>
+      <div class="btn-row"><button class="btn btn-ghost" onclick="fhCloseHelp()">← Tilbage til eftersyn</button></div>
     </div>` : `
     <div class="modal fh-sheet" role="dialog" aria-label="Faglig hjælp">
-      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk">✕</button>
-      <h2>ⓘ ${esc(e.t)}</h2>
+      <button class="modal-close" onclick="fhCloseHelp()" aria-label="Luk hjælp">✕</button>
+      <h2>ⓘ ${esc(title)}</h2>
+      ${e.partial?'<p class="fh-warn">Punktet er kun delvist beskrevet i brochuren.</p>':''}
       <div class="fh-sec"><b>Hvad skal kontrolleres</b><p>${esc(e.check)}</p></div>
-      <div class="fh-sec"><b>Vær særligt opmærksom på</b><p>${esc(e.attention)}</p></div>
-      <div class="fh-sec"><b>Målemetode</b><p>${esc(e.method)}</p></div>
-      <div class="fh-sec"><b>Henvisning</b><p>Brochuren "Sikkerhed på lageret", ${pg.length>1?'side ':'side '}${pg.join(', ')}.</p></div>
-      <div class="fh-thumbs" id="fhThumbs">${pg.map(p=>`<button class="fh-thumb" onclick="fhCloseHelp();openBrochure(${p})" aria-label="Åbn side ${p}"><canvas data-fhpage="${p}"></canvas><span>Side ${p}</span></button>`).join('')}</div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="fhCloseHelp();openBrochure(${pg[0]})">📖 Åbn side ${pg[0]} i brochuren</button></div>
+      <div class="fh-sec"><b>Hvordan kontrolleres det</b><p>${esc(e.how)}</p></div>
+      <div class="fh-sec"><b>Typiske fejl</b><p>${esc(e.faults)}</p></div>
+      <div class="fh-sec"><b>Relevante fotos / målinger</b><p>${esc(e.photo)}</p></div>
+      ${e.limit?`<div class="fh-sec"><b>Vejledende grænse fra brochuren</b><p>${esc(e.limit)}</p></div>`:''}
+      <div class="fh-sec"><b>Henvisning</b><p>Brochuren "Sikkerhed på lageret", side ${pg.join(', ')}.</p></div>
+      <div class="fh-thumbs" id="fhThumbs">${pg.map(p=>`<button class="fh-thumb" onclick="openBrochure(${p})" aria-label="Åbn side ${p}"><canvas data-fhpage="${p}"></canvas><span>Side ${p}</span></button>`).join('')}</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openBrochure(${pg[0]})">📖 Åbn side ${pg[0]} i brochuren</button>
+        ${canMeasure?`<button class="btn btn-ghost" onclick="fhMeasure('${e.key}')">📏 Registrér måling</button>`:''}
+        <button class="btn btn-ghost" onclick="fhCloseHelp()">← Tilbage til eftersyn</button>
+      </div>
       <p class="fh-disc">Opslag til støtte. Vurdering, farve, handling og godkendelse foretages af den sagkyndige inspektør.</p>
     </div>`;
   document.body.appendChild(o);
@@ -5123,8 +5249,7 @@ function fhCloseHelp(){ const o=document.getElementById('fhHelpOverlay'); if(o) 
 async function fhRenderThumbs(){
   try{
     const pdf = await fhGetPdf();
-    const cs = document.querySelectorAll('#fhThumbs canvas');
-    for(const c of cs){
+    for(const c of document.querySelectorAll('#fhThumbs canvas')){
       const page = await pdf.getPage(parseInt(c.dataset.fhpage,10));
       const vp0 = page.getViewport({scale:1});
       const scale = 130/vp0.width, dpr = Math.min(window.devicePixelRatio||1,2);
@@ -5136,7 +5261,7 @@ async function fhRenderThumbs(){
 }
 
 /* ---------- PDF-adgang: lokal fil → ellers indlejret kopi (file://) ---------- */
-const FH = { bytes:null, pdf:null, loading:null, scale:1, zoom:1 };
+const FH = { bytes:null, pdf:null, loading:null, zoom:1, scrollY:0, opener:null };
 function fhLoadScript(src){
   return new Promise((res,rej)=>{
     const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('Kunne ikke indlæse '+src)); document.head.appendChild(s);
@@ -5169,47 +5294,55 @@ async function fhGetPdf(){
   try{ return await FH.loading; } finally { FH.loading = null; }
 }
 
-/* ---------- Viser ---------- */
+/* ---------- Viser: overlay oven på eftersynet. Ingen render(), ingen navigation, ingen ny fane ---------- */
 function openBrochure(page){
   page = Math.max(1, Math.min(FAGLIG.pages, parseInt(page,10)||1));
   let v = document.getElementById('fhViewer');
   if(v){ fhScrollTo(page); return; }
+  FH.scrollY = window.scrollY; FH.opener = document.activeElement;
+  const inInsp = (state.view==='wizard' || state.view==='workScreen');
   v = document.createElement('div');
   v.id='fhViewer'; v.className='fh-viewer';
   v.setAttribute('role','dialog'); v.setAttribute('aria-label','Sikkerhed på lageret');
   v.innerHTML = `
     <div class="fh-bar">
-      <button class="fh-close" onclick="closeBrochure()" aria-label="Luk brochure">✕ Luk</button>
-      <div class="fh-title">${esc(FAGLIG.title)}</div>
+      <button class="fh-back" id="fhBack" onclick="closeBrochure()">← ${inInsp?'Tilbage til eftersyn':'Tilbage'}</button>
+      <button class="fh-x" onclick="closeBrochure()" aria-label="Luk brochure">✕</button>
+      <button class="fh-dl" onclick="downloadBrochure()" aria-label="Download PDF">⬇<span class="fh-dl-t"> Download PDF</span></button>
       <div class="fh-ctl">
         <button onclick="fhStep(-1)" aria-label="Forrige side">‹</button>
-        <span id="fhPageInd">1 / ${FAGLIG.pages}</span>
+        <span id="fhPageInd">${page} / ${FAGLIG.pages}</span>
         <button onclick="fhStep(1)" aria-label="Næste side">›</button>
         <button onclick="fhZoom(-0.25)" aria-label="Zoom ud">−</button>
         <button onclick="fhZoom(0.25)" aria-label="Zoom ind">+</button>
-        <button class="fh-dl" onclick="downloadBrochure()">⬇ Download PDF</button>
       </div>
     </div>
     <div class="fh-body" id="fhBody"><div class="fh-msg" id="fhMsg">Åbner brochure…</div></div>`;
   document.body.appendChild(v);
-  document.body.classList.add('fh-open');
-  document.addEventListener('keydown', fhKey);
+  try{ if(!(history.state && history.state.fhViewer)) history.pushState({fhViewer:1}, ''); }catch(e){}
   window.addEventListener('resize', fhResizeDebounced);
   fhBuild(page);
 }
-function closeBrochure(){
-  const v=document.getElementById('fhViewer'); if(v) v.remove();
-  document.body.classList.remove('fh-open');
-  document.removeEventListener('keydown', fhKey);
+function closeBrochure(fromPop){
+  const v=document.getElementById('fhViewer');
+  if(v) v.remove();
   window.removeEventListener('resize', fhResizeDebounced);
+  try{ if(fromPop!==true && history.state && history.state.fhViewer) history.back(); }catch(e){}
+  // Sikkerhedsnet: samme scrollposition og fokus som før hjælpen blev åbnet
+  if(v){ try{ if(Math.abs(window.scrollY-FH.scrollY)>1) window.scrollTo(0,FH.scrollY); if(FH.opener&&FH.opener.isConnected) FH.opener.focus({preventScroll:true}); }catch(e){} }
 }
-function fhKey(e){
-  if(e.key==='Escape') closeBrochure();
-  else if(e.key==='ArrowRight') fhStep(1);
-  else if(e.key==='ArrowLeft') fhStep(-1);
-}
+window.addEventListener('popstate', ()=>{ if(document.getElementById('fhViewer')) closeBrochure(true); });
+document.addEventListener('keydown', e=>{
+  const viewer = document.getElementById('fhViewer');
+  if(e.key==='Escape'){
+    if(viewer) closeBrochure();
+    else if(document.getElementById('fhMeasureOverlay')) fhCloseMeasure();
+    else if(document.getElementById('fhHelpOverlay')) fhCloseHelp();
+  } else if(viewer && e.key==='ArrowRight') fhStep(1);
+  else if(viewer && e.key==='ArrowLeft') fhStep(-1);
+});
 let fhRT=null;
-function fhResizeDebounced(){ clearTimeout(fhRT); fhRT=setTimeout(()=>{ const p=fhCurPage(); fhBuild(p); },250); }
+function fhResizeDebounced(){ clearTimeout(fhRT); fhRT=setTimeout(()=>{ if(document.getElementById('fhViewer')) fhBuild(fhCurPage()); },250); }
 async function fhBuild(startPage){
   const body = document.getElementById('fhBody'); if(!body) return;
   try{
@@ -5229,11 +5362,9 @@ async function fhBuild(startPage){
       c.width=vp.width; c.height=vp.height; c.style.width=(vp.width/dpr)+'px'; c.style.height=(vp.height/dpr)+'px';
       c.setAttribute('aria-label','Side '+i);
       w.appendChild(c); body.appendChild(w); wraps.push([page,c,vp]);
-      if(i===1) { /* vis første side hurtigt */ }
     }
     fhScrollTo(startPage, true);
     body.onscroll = fhUpdateInd;
-    // Render den ønskede side først, derefter resten
     const order = wraps.map((x,i)=>i).sort((a,b)=>Math.abs(a-(startPage-1))-Math.abs(b-(startPage-1)));
     for(const idx of order){
       if(!document.getElementById('fhBody')) return;
@@ -5243,7 +5374,7 @@ async function fhBuild(startPage){
     fhUpdateInd();
   }catch(e){
     const m = document.getElementById('fhBody');
-    if(m) m.innerHTML = '<div class="fh-msg">Brochuren kunne ikke vises her ('+esc(e.message||e)+'). Brug "Download PDF" for at åbne den i din PDF-læser.</div>';
+    if(m) m.innerHTML = '<div class="fh-msg">Brochuren kunne ikke vises her ('+esc(e.message||e)+').<br>Dine registreringer er urørte. Tryk "← Tilbage" for at fortsætte, eller "Download PDF" for at åbne brochuren i din PDF-læser.</div>';
   }
 }
 function fhCurPage(){
@@ -5271,59 +5402,185 @@ async function downloadBrochure(){
   }catch(e){ toast('Download mislykkedes'); }
 }
 
-/* ---------- Faglig hjælp-side ---------- */
+/* ---------- Faglig hjælp-side (forside) ---------- */
 function renderFagligHjaelp(){
   const rows = HOVEDOMRAADER.map(h=>{
-    const e = FAGLIG.help[h.key]; const pg = e && e.pages.length ? 's. '+e.pages.join(', ') : 'ikke omtalt';
-    return `<div class="fh-row"><span>${esc(h.label)}</span><span class="fh-pg">${pg}</span>${e&&!e.none?`<button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button>`:'<span class="fh-i-ph"></span>'}</div>`;
+    const e = FAGLIG.help[h.key];
+    const pg = e && e.pages.length ? 's. '+e.pages.join(', ') : 'ikke beskrevet';
+    return `<div class="fh-row"><span>${esc(h.label)}</span><span class="fh-pg">${pg}</span><button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button></div>`;
   }).join('');
   return `
   <div class="panel">
     <h2>📘 Faglig hjælp</h2>
     <div class="fh-card">
-      <div>
-        <h3>${esc(FAGLIG.title)}</h3>
-        <p>Reoler A/S' brochure om sikkerhed på lageret — fagligt opslagsværk til reoleftersyn. Vises uændret.</p>
-      </div>
+      <div><h3>${esc(FAGLIG.title)}</h3>
+      <p>Reoler A/S' brochure om sikkerhed på lageret — fagligt opslagsværk til reoleftersyn. Vises uændret.</p></div>
       <div class="btn-row" style="margin:0">
         <button class="btn btn-primary btn-lg" onclick="openBrochure(1)">📖 Åbn brochure</button>
         <button class="btn btn-ghost" onclick="downloadBrochure()">⬇ Download PDF</button>
       </div>
     </div>
-    <h3 style="margin:20px 0 8px;color:var(--navy);font-size:15px">Kontrolpunkter og brochurens sider</h3>
+    <h3 style="margin:20px 0 8px;color:var(--navy);font-size:15px">De ${HOVEDOMRAADER.length} kontrolpunkter og brochurens sider</h3>
     <div class="fh-list">${rows}</div>
-    <h3 style="margin:18px 0 8px;color:var(--navy);font-size:15px">Også i brochuren</h3>
-    <div class="fh-list">${Object.entries(FAGLIG.extra).map(([k,e])=>`<div class="fh-row"><span>${esc(e.t)}</span><span class="fh-pg">s. ${e.pages.join(', ')}</span><button class="fh-i" onclick="fhHelp('ctrl','${k}')" aria-label="Hjælp: ${esc(e.t)}">ⓘ</button></div>`).join('')}</div>
     <p class="fh-disc">Brochuren er © Reoler A/S og er indlagt uændret. Tegningerne på s. 5–6 er Reoler A/S' ejendom. Hjælpen er opslag — vurdering, farve, handling og godkendelse foretages af den sagkyndige inspektør.</p>
   </div>`;
 }
 
-/* ---------- Kontrolpunkter-panel (valgfrit, under Skader) ---------- */
-function fhCtrlPanel(insp){
-  const cl = insp.checklist || {};
-  const rows = HOVEDOMRAADER.map(h=>{
-    const e = FAGLIG.help[h.key]; const v = cl[h.key];
-    return `<div class="fh-crow">
-      <span class="fh-cl">${esc(h.label)}</span>
-      ${e&&!e.none?`<button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button>`:'<span class="fh-i-ph"></span>'}
+/* ---------- Kontrolliste (valgfri, under Skader): OK / Afvigelse / Ikke relevant / Ikke kontrolleret ---------- */
+function fhRow(insp, h){
+  const e = FAGLIG.help[h.key]; const v = (insp.checklist||{})[h.key];
+  const ms = (insp.measurements||[]).filter(m=>m.ctrlKey===h.key).length;
+  const st = v ? FH_STATUS[v] : 'Ikke kontrolleret';
+  return `<div class="fh-crow" data-key="${h.key}">
+    <div class="fh-chead">
+      <span class="fh-cl">${esc(h.label)}<small class="fh-st ${v||'unc'}">${st}</small></span>
+      <button class="fh-i" onclick="fhHelp('ctrl','${h.key}')" aria-label="Hjælp: ${esc(h.label)}">ⓘ</button>
+    </div>
+    <div class="fh-cbtns">
       <button class="fh-mk ok ${v==='ok'?'sel':''}" onclick="fhMark('${h.key}','ok')" aria-pressed="${v==='ok'}">OK</button>
       <button class="fh-mk bad ${v==='fejl'?'sel':''}" onclick="fhMark('${h.key}','fejl')" aria-pressed="${v==='fejl'}">Afvigelse</button>
-    </div>`;
-  }).join('');
-  const done = HOVEDOMRAADER.filter(h=>cl[h.key]).length;
-  return `<details class="fh-ctrl" ${state.fhCtrlOpen?'open':''} ontoggle="state.fhCtrlOpen=this.open">
-    <summary>Kontrolpunkter (${HOVEDOMRAADER.length}) <span class="optional-tag">valgfri · ${done} markeret</span></summary>
-    <p class="fh-disc" style="margin:8px 0">Ikke udfyldt som standard. Markering sker kun af inspektøren.</p>
-    ${rows}
+      <button class="fh-mk na ${v==='ikr'?'sel':''}" onclick="fhMark('${h.key}','ikr')" aria-pressed="${v==='ikr'}">Ikke relevant</button>
+      ${FAGLIG.measure[h.key]?`<button class="fh-mk meas" onclick="fhMeasure('${h.key}')">📏 Mål${ms?' ('+ms+')':''}</button>`:''}
+      ${v==='fejl'?`<button class="fh-mk reg" onclick="fhRegisterDamage('${h.key}')">＋ Registrér skade</button>`:''}
+    </div>
+  </div>`;
+}
+function fhCtrlPanel(insp){
+  const pts = ctrlPoints(insp), s = ctrlSummary(insp);
+  return `<details class="fh-ctrl" id="fhCtrl" ${state.fhCtrlOpen?'open':''} ontoggle="state.fhCtrlOpen=this.open">
+    <summary>Kontrolliste (${pts.length}) <span class="optional-tag">${s.done} af ${s.total} kontrolleret · ${s.unc} ikke kontrolleret</span></summary>
+    <p class="fh-disc" style="margin:8px 0">Alle punkter står som "Ikke kontrolleret", indtil du vælger. Intet markeres automatisk.</p>
+    ${pts.map(h=>fhRow(insp,h)).join('')}
   </details>`;
+}
+function fhRefreshPanel(insp){
+  const el=document.getElementById('fhCtrl'); if(!el) return;
+  state.fhCtrlOpen = true;
+  const tmp=document.createElement('div'); tmp.innerHTML=fhCtrlPanel(insp);
+  el.replaceWith(tmp.firstElementChild);
 }
 function fhMark(key, val){
   const insp = getInspection(state.currentInspectionId); if(!insp) return;
   insp.checklist = insp.checklist || {};
   if(insp.checklist[key]===val) delete insp.checklist[key]; else insp.checklist[key]=val;
-  saveDB(DB); state.fhCtrlOpen = true; const y=window.scrollY; render(); window.scrollTo(0,y);
+  saveDB(DB); fhRefreshPanel(insp);   // kun panelet opdateres — scroll og øvrige felter urørt
+  if(insp.checklist[key]==='fejl') toast('Afvigelse markeret — tryk "＋ Registrér skade" for at registrere den');
+}
+function fhRegisterDamage(key){ startWorkScreen(null, key); }
+
+/* ---------- Målinger ---------- */
+function fhReadPhoto(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=()=>{ const img=new Image(); img.onload=()=>{
+      const max=1000, k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas');
+      c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      res(c.toDataURL('image/jpeg',0.7)); }; img.onerror=rej; img.src=fr.result; };
+    fr.onerror=rej; fr.readAsDataURL(file);
+  });
+}
+function fhCloseMeasure(){ const o=document.getElementById('fhMeasureOverlay'); if(o) o.remove(); }
+function fhMeasure(key){
+  const insp=getInspection(state.currentInspectionId); if(!insp){ toast('Åbn et eftersyn først'); return; }
+  const m=FAGLIG.measure[key]; if(!m) return;
+  fhCloseMeasure();
+  const o=document.createElement('div'); o.className='modal-overlay'; o.id='fhMeasureOverlay'; o.dataset.key=key;
+  o.onclick=ev=>{ if(ev.target===o) fhCloseMeasure(); };
+  const saved=(insp.measurements||[]).filter(x=>x.ctrlKey===key);
+  o.innerHTML=`<div class="modal fh-sheet" role="dialog" aria-label="Måling">
+    <button class="modal-close" onclick="fhCloseMeasure()" aria-label="Luk">✕</button>
+    <h2>📏 ${esc(m.title)}</h2>
+    <p class="fh-disc" style="margin:0 0 8px"><b>Målemetode:</b> ${esc(m.method)} <a href="#" onclick="event.preventDefault();openBrochure(${m.pages[0]})">Se illustration, side ${m.pages[0]}</a></p>
+    <div class="formgrid">
+      <div class="field"><label>Reol</label><select id="fm_reol"><option value="">—</option>${insp.reoler.map(r=>`<option value="${esc(r.id)}">${esc(r.id)}</option>`).join('')}</select></div>
+      <div class="field"><label>Konstruktion / målesituation</label><select id="fm_con" onchange="fhMeasureInfo()"><option value="">Vælg…</option>${m.cons.map(c=>`<option value="${c.k}">${esc(c.label)}</option>`).join('')}<option value="x">Anden / ved ikke</option></select></div>
+      ${m.needLen?`<div class="field full"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="fm_len" onchange="fhMeasureInfo()" style="width:22px;height:22px"> Målt over ${m.needLen} mm</label></div>`:''}
+      <div class="field"><label>Målt værdi (mm)</label><input id="fm_val" type="number" inputmode="decimal" step="0.1" min="0" oninput="fhMeasureInfo()"></div>
+      <div class="field"><label>Måleretning</label><select id="fm_dir"><option value="">—</option>${FAGLIG.dirs.map(d=>`<option>${esc(d)}</option>`).join('')}</select></div>
+      <div class="field full"><label>Foto</label><input id="fm_photo" type="file" accept="image/*" capture="environment"></div>
+      <div class="field full"><label>Kommentar</label><textarea id="fm_note" rows="2"></textarea></div>
+    </div>
+    <div class="fh-info" id="fm_info"></div>
+    <div class="btn-row"><button class="btn btn-green btn-lg" onclick="fhSaveMeasure('${key}')">Gem måling</button><button class="btn btn-ghost" onclick="fhCloseMeasure()">Annullér</button></div>
+    ${saved.length?`<div class="fh-sec" style="margin-top:12px"><b>Gemte målinger (${saved.length})</b>${saved.map(x=>`<div class="fh-ms"><span>${esc(x.reolId||'–')} · ${x.valueMm} mm${x.direction?' · '+esc(x.direction):''}${x.limitMm!=null?' · grænse '+x.limitMm+' mm (s. '+x.limitPage+')':''}${x.comment?' · '+esc(x.comment):''}</span><button class="fh-i" onclick="fhDelMeasure('${x.id}')" aria-label="Slet måling">✕</button></div>`).join('')}</div>`:''}
+  </div>`;
+  document.body.appendChild(o); fhMeasureInfo();
+}
+function fhMeasureLimit(key){
+  const m=FAGLIG.measure[key]; const con=(document.getElementById('fm_con')||{}).value;
+  const lenOk = !m.needLen || (document.getElementById('fm_len')||{}).checked;
+  const c=m.cons.find(x=>x.k===con);
+  return (c && lenOk) ? {limit:c.limit, page:m.pages[0], label:c.label} : null;
+}
+function fhMeasureInfo(){
+  const o=document.getElementById('fhMeasureOverlay'); if(!o) return; const key=o.dataset.key;
+  const L=fhMeasureLimit(key); const v=parseFloat((document.getElementById('fm_val')||{}).value);
+  let t;
+  if(!L) t='Ingen vejledende grænse vises: vælg den konstruktion og målesituation, der svarer til brochurens tegning'+(FAGLIG.measure[key].needLen?' (og bekræft målelængden)':'')+'. Gælder brochurens situation ikke, vurderer inspektøren selv.';
+  else{
+    t=`Vejledende grænse fra brochuren (s. ${L.page}): maks. ${L.limit} mm.`;
+    if(!isNaN(v)) t+= v>L.limit ? ` Målt ${v} mm er over den vejledende grænse — vurder om en afvigelse skal registreres.` : ` Målt ${v} mm er ikke over den vejledende grænse. Det er ikke i sig selv en godkendelse — vurderingen foretages af inspektøren.`;
+  }
+  document.getElementById('fm_info').textContent=t;
+}
+async function fhSaveMeasure(key){
+  const insp=getInspection(state.currentInspectionId); if(!insp) return;
+  const v=parseFloat(document.getElementById('fm_val').value);
+  if(isNaN(v)||v<0){ toast('Indtast målt værdi i mm'); return; }
+  const L=fhMeasureLimit(key), f=document.getElementById('fm_photo').files[0];
+  let photo=null; if(f){ try{ photo=await fhReadPhoto(f); }catch(e){ toast('Foto kunne ikke læses'); } }
+  insp.measurements=insp.measurements||[];
+  insp.measurements.push({ id:uid('ms'), ctrlKey:key, reolId:document.getElementById('fm_reol').value, valueMm:v,
+    direction:document.getElementById('fm_dir').value, comment:document.getElementById('fm_note').value.trim(), photo,
+    construction:L?L.label:null, limitMm:L?L.limit:null, limitPage:L?L.page:null, ts:new Date().toISOString() });
+  saveDB(DB); fhCloseMeasure(); fhRefreshPanel(insp); toast('Måling gemt');
+}
+function fhDelMeasure(id){
+  const insp=getInspection(state.currentInspectionId); if(!insp) return;
+  const key=(document.getElementById('fhMeasureOverlay')||{dataset:{}}).dataset.key;
+  insp.measurements=(insp.measurements||[]).filter(x=>x.id!==id); saveDB(DB); fhRefreshPanel(insp);
+  if(key) fhMeasure(key);
 }
 
+/* ---------- Historik fra tidligere eftersyn (kun visning — overføres aldrig som nye) ---------- */
+function fhHistoryItems(insp){
+  return DB.inspections.filter(i=>i.customerId===insp.customerId && i.id!==insp.id)
+    .flatMap(i=>(i.skader||[]).map(s=>({s, date:i.date, rep:i.reportNumber||'', open:i.status==='open'})))
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+function fhHistoryPanel(insp){
+  const items=fhHistoryItems(insp); if(!items.length) return '';
+  const cls={green:'Grøn',yellow:'Gul',red:'Rød'};
+  return `<details class="fh-ctrl" id="fhHist"><summary>📚 Historik fra tidligere eftersyn <span class="optional-tag">${items.length} skader · kun visning</span></summary>
+    <p class="fh-disc" style="margin:8px 0">Oprindelig status og dato. Intet herfra er overført som nyt resultat.</p>
+    ${items.slice(0,40).map(x=>`<div class="fh-hrow"><span class="pill ${x.s.classification||'grey'}" style="font-size:10px">${cls[x.s.classification]||'–'}</span><span class="fh-cl">${esc(x.s.reolId||'')} · ${esc(x.s.defectType||'')}<small>${fmtDate(x.date)}${x.rep?' · '+esc(x.rep):''} · status: ${esc(x.s.status||'')}</small></span></div>`).join('')}
+    ${items.length>40?`<p class="fh-disc">+ ${items.length-40} flere i Rapporter/Historik.</p>`:''}
+  </details>`;
+}
+
+/* ---------- Genbrug seneste eftersyn (valgfrit) ---------- */
+function fhPrevInspection(customerId){
+  const list=DB.inspections.filter(i=>i.customerId===customerId && (i.reoler||[]).length)
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return list.find(i=>i.status==='closed') || list[0] || null;
+}
+function updateReuseRow(){
+  const row=document.getElementById('reuseRow'); if(!row) return;
+  const nm=((document.getElementById('f_name')||{}).value||'').trim().toLowerCase();
+  const c=DB.customers.find(x=>x.name.toLowerCase()===nm);
+  const p=c?fhPrevInspection(c.id):null;
+  row.style.display=p?'':'none';
+  const t=document.getElementById('reuseText');
+  if(t&&p) t.textContent=`Start ud fra seneste eftersyn (${fmtDate(p.date)}${p.reportNumber?' · '+p.reportNumber:''}): ${p.reoler.length} reoler`;
+}
+function fhReuseData(customerId){
+  if(!(document.getElementById('f_reuse')||{}).checked) return null;
+  const p=fhPrevInspection(customerId); if(!p) return null;
+  return {
+    reoler:p.reoler.map(r=>({id:r.id, zone:r.zone||'', hal:r.hal||'', reolraekke:r.reolraekke||'', location:r.location||'', type:r.type||'', producer:r.producer||'', loadSign:r.loadSign||'', notes:''})),
+    basedOn:{id:p.id, reportNumber:p.reportNumber||'', date:p.date}
+  };
+}
 
 /* Offline-cache (kun http/https) */
 try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}

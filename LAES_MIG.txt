@@ -1,4 +1,4 @@
-ReolScan RC5.4
-Åbn index.html. Mapper (skal følge med): faglig-hjaelp/, pdfjs/, logo/, sw.js.
-Offline-brug kræver hosting via http/https (fx GitHub Pages) — åbnes index.html direkte som fil, virker alt undtagen offline-cachen.
+ReolScan RC5.5
+Åbn index.html. Mapper der skal følge med: faglig-hjaelp/, pdfjs/, logo/, sw.js.
+Offline-brug kræver hosting via http/https (fx GitHub Pages). Åbnes index.html direkte som fil, virker alt undtagen offline-cachen.
 Opdater IKKE GitHub før godkendelse.

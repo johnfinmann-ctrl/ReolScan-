@@ -1,101 +1,116 @@
-# ReolScan RC5.4 – Testresultat
+# ReolScan RC5.5 – Testresultat
 
-Testet i Chromium (Playwright): PC 1280×800, tablet 820×1180, mobil 390×844, file:// og http, offline.
+Chromium (Playwright): PC 1280×800, tablet 820×1180, mobil 390×844 (touch); file:// og http; offline via service worker.
 
-## Nye RC5.4-tests (85 bestået, 0 fejlet)
+## Nye RC5.5-tests: 99 bestået, 0 fejlet
 ```
-PASS · PC "Faglig hjælp" findes på forsiden
-PASS · PC forsidens 3 hovedfelter uændret — START REOLEFTERSYN|FORTSÆT EFTERSYN|EFTERSYNSRAPPORTER
-PASS · PC Faglig hjælp-side åbner
-PASS · PC PDF vises i appen (12 sider tegnet, ikke tomme) — {"n":12,"nonBlank":12} åbnet på 914 ms
-PASS · PC Luk-knap synlig og ≥44 px — 72×44
-PASS · PC Download-knap synlig, ingen vandret overflow
-PASS · PC downloadet PDF er byte-identisk med original — Sikkerhed-paa-lageret.pdf 33347dc2acc1b451631849e98ed26e7a
-PASS · PC hop til side 5 — 5 / 12
-PASS · PC zoom virker (sider genopbygget)
-PASS · PC Luk lukker straks og fjerner viser — 460 ms
-PASS · PC Esc lukker (PC)
-PASS · PC nyt eftersyn: ingen forudfyldt tjekliste (RC5.3 havde opdigtet data) — {}
-PASS · PC Kontrolpunkter-panel (14) findes, lukket som standard, valgfri
-PASS · PC markering OK/Afvigelse gemmes af inspektøren — {"stolper":"fejl","vanger":"ok"}
-PASS · PC markering kan fjernes igen
-PASS · PC ⓘ ved relevante kontrolpunkter (10 af 14; 4 ikke omtalt i brochuren) — 10
-PASS · PC hjælpeark: hvad/opmærksom/målemetode/side + miniature + åbn-knap
-PASS · PC "Åbn side" åbner brochuren på den henviste side — 3 / 12
-PASS · PC efter luk er eftersynet intakt (samme visning/inspektion)
-PASS · PC skade: INTET forvalgt (prioritet/handling) — kun stiplet forslag — {"cls":null,"acts":0,"sug":"red","dash":1,"sel":0}
-PASS · PC skade kan ikke gemmes uden inspektørens prioritet
-PASS · PC skade gemmes med inspektørens valgte farve (gul) — yellow
-PASS · PC Afslut-knap deaktiveret uden samlet vurdering
-PASS · PC finishInspection() lukker IKKE uden vurdering (ingen automatisk godkendelse)
-PASS · PC lukker med inspektørens egen vurdering
-PASS · PC rapport-PDF genereres; ingen opdigtet tjekliste-afvigelse
-PASS · TABLET "Faglig hjælp" findes på forsiden
-PASS · TABLET forsidens 3 hovedfelter uændret — START REOLEFTERSYN|FORTSÆT EFTERSYN|EFTERSYNSRAPPORTER
-PASS · TABLET Faglig hjælp-side åbner
-PASS · TABLET PDF vises i appen (12 sider tegnet, ikke tomme) — {"n":12,"nonBlank":12} åbnet på 670 ms
-PASS · TABLET Luk-knap synlig og ≥44 px — 72×44
-PASS · TABLET Download-knap synlig, ingen vandret overflow
-PASS · TABLET downloadet PDF er byte-identisk med original — Sikkerhed-paa-lageret.pdf 33347dc2acc1b451631849e98ed26e7a
-PASS · TABLET hop til side 5 — 5 / 12
-PASS · TABLET zoom virker (sider genopbygget)
-PASS · TABLET Luk lukker straks og fjerner viser — 17 ms
-PASS · TABLET Esc lukker (PC)
-PASS · TABLET nyt eftersyn: ingen forudfyldt tjekliste (RC5.3 havde opdigtet data) — {}
-PASS · TABLET Kontrolpunkter-panel (14) findes, lukket som standard, valgfri
-PASS · TABLET markering OK/Afvigelse gemmes af inspektøren — {"stolper":"fejl","vanger":"ok"}
-PASS · TABLET markering kan fjernes igen
-PASS · TABLET ⓘ ved relevante kontrolpunkter (10 af 14; 4 ikke omtalt i brochuren) — 10
-PASS · TABLET hjælpeark: hvad/opmærksom/målemetode/side + miniature + åbn-knap
-PASS · TABLET "Åbn side" åbner brochuren på den henviste side — 3 / 12
-PASS · TABLET efter luk er eftersynet intakt (samme visning/inspektion)
-PASS · TABLET skade: INTET forvalgt (prioritet/handling) — kun stiplet forslag — {"cls":null,"acts":0,"sug":"red","dash":1,"sel":0}
-PASS · TABLET skade kan ikke gemmes uden inspektørens prioritet
-PASS · TABLET skade gemmes med inspektørens valgte farve (gul) — yellow
-PASS · TABLET Afslut-knap deaktiveret uden samlet vurdering
-PASS · TABLET finishInspection() lukker IKKE uden vurdering (ingen automatisk godkendelse)
-PASS · TABLET lukker med inspektørens egen vurdering
-PASS · MOBIL "Faglig hjælp" findes på forsiden
-PASS · MOBIL forsidens 3 hovedfelter uændret — START REOLEFTERSYN|FORTSÆT EFTERSYN|EFTERSYNSRAPPORTER
-PASS · MOBIL Faglig hjælp-side åbner
-PASS · MOBIL PDF vises i appen (12 sider tegnet, ikke tomme) — {"n":12,"nonBlank":12} åbnet på 535 ms
-PASS · MOBIL Luk-knap synlig og ≥44 px — 68×44
-PASS · MOBIL Download-knap synlig, ingen vandret overflow
-PASS · MOBIL downloadet PDF er byte-identisk med original — Sikkerhed-paa-lageret.pdf 33347dc2acc1b451631849e98ed26e7a
-PASS · MOBIL hop til side 5 — 5 / 12
-PASS · MOBIL zoom virker (sider genopbygget)
-PASS · MOBIL Luk lukker straks og fjerner viser — 25 ms
-PASS · MOBIL Esc lukker (PC)
-PASS · MOBIL nyt eftersyn: ingen forudfyldt tjekliste (RC5.3 havde opdigtet data) — {}
-PASS · MOBIL Kontrolpunkter-panel (14) findes, lukket som standard, valgfri
-PASS · MOBIL markering OK/Afvigelse gemmes af inspektøren — {"stolper":"fejl","vanger":"ok"}
-PASS · MOBIL markering kan fjernes igen
-PASS · MOBIL ⓘ ved relevante kontrolpunkter (10 af 14; 4 ikke omtalt i brochuren) — 10
-PASS · MOBIL hjælpeark: hvad/opmærksom/målemetode/side + miniature + åbn-knap
-PASS · MOBIL "Åbn side" åbner brochuren på den henviste side — 3 / 12
-PASS · MOBIL efter luk er eftersynet intakt (samme visning/inspektion)
-PASS · MOBIL skade: INTET forvalgt (prioritet/handling) — kun stiplet forslag — {"cls":null,"acts":0,"sug":"red","dash":1,"sel":0}
-PASS · MOBIL skade kan ikke gemmes uden inspektørens prioritet
-PASS · MOBIL skade gemmes med inspektørens valgte farve (gul) — yellow
-PASS · MOBIL Afslut-knap deaktiveret uden samlet vurdering
-PASS · MOBIL finishInspection() lukker IKKE uden vurdering (ingen automatisk godkendelse)
-PASS · MOBIL lukker med inspektørens egen vurdering
-PASS · Alle sidehenvisninger ligger inden for 1–12
-PASS · Sidehenvisninger verificeret mod brochurens tekst (23 tjek)
-PASS · Sidehenvisninger for "Også i brochuren" verificeret
-PASS · HTTP: brochuren vises fra lokal fil (fetch)
-PASS · Service worker har cachet app, PDF, pdf.js og logo — / /index.html /logo/reoler-as-logo-lys-baggrund.png /logo/reoler-as-logo-moerk-baggrund.png /logo/reoler-as-logo-original.png /pdfjs/pdf.min.js /pdfjs/pdf.worker.min.js /faglig-hjaelp/Sikkerhed-paa-lageret.pdf
-PASS · OFFLINE: appen genindlæses uden netværk
-PASS · OFFLINE: brochuren åbner og vises (12 sider)
+PASS · PC 18 kontrolpunkter; de 14 første uændret og i samme rækkefølge — 18
+PASS · PC nyt eftersyn: alle 18 står som "Ikke kontrolleret" (ingen auto-OK)
+PASS · PC panel viser 18 rækker, alle "Ikke kontrolleret"
+PASS · PC hver række viser teksten "Ikke kontrolleret"
+PASS · PC alle 18 kan sættes til OK/Afvigelse/Ikke relevant og tilbage til Ikke kontrolleret — 18 punkter
+PASS · PC ⓘ ved alle 18; 14 har fuld hjælp, 4 siger tydeligt "Ikke beskrevet i brochuren" — 14 fuld, ikke beskrevet: belysning/gangarealer/gulv/orden
+PASS · PC alle sidehenvisninger 1–12
+PASS · PC knapper ≥ 32 px (ⓘ) / ≥44 px (statusknapper)
+PASS · PC ingen vandret overflow på kontrolliste
+PASS · PC ⓘ → brochuren åbner som overlay direkte på relevant side (s. 3) — 3 / 12 · åbnet på 1291 ms
+PASS · PC øverst: "← Tilbage til eftersyn", tydelig og ≥44 px høj — ← Tilbage til eftersyn 792×48
+PASS · PC tilbageknappen er stadig synlig efter scroll til s. 9
+PASS · PC Tilbage lukker viseren; hjælpearket ligger stadig under (samme sted)
+PASS · PC tilbage på præcis samme sted: fane, åbent panel, scroll, kunde/eftersyn — {"b":0,"a":0}
+PASS · PC ingen genindlæsning/render (samme DOM-element), ingen ny fane, URL uændret, gemt markering bevaret
+PASS · PC lukker med X — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · PC lukker med Esc — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · PC lukker med browserens tilbage-knap (Android) — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · PC arbejdsskærm: ikke-gemt tekst, foto og scroll bevaret efter hjælp (TEXTAREA#probe) — {"wb":{"y":0,"val":"IKKE-GEMT 123"},"wa":{"y":0,"val":"IKKE-GEMT 123","m":true,"view":"workScreen","photos":1}}
+PASS · PC PDF kan ikke indlæses: fejltekst vises, hjælp kan lukkes, arbejdet fortsætter uden tab
+PASS · TABLET 18 kontrolpunkter; de 14 første uændret og i samme rækkefølge — 18
+PASS · TABLET nyt eftersyn: alle 18 står som "Ikke kontrolleret" (ingen auto-OK)
+PASS · TABLET panel viser 18 rækker, alle "Ikke kontrolleret"
+PASS · TABLET hver række viser teksten "Ikke kontrolleret"
+PASS · TABLET alle 18 kan sættes til OK/Afvigelse/Ikke relevant og tilbage til Ikke kontrolleret — 18 punkter
+PASS · TABLET ⓘ ved alle 18; 14 har fuld hjælp, 4 siger tydeligt "Ikke beskrevet i brochuren" — 14 fuld, ikke beskrevet: belysning/gangarealer/gulv/orden
+PASS · TABLET alle sidehenvisninger 1–12
+PASS · TABLET knapper ≥ 32 px (ⓘ) / ≥44 px (statusknapper)
+PASS · TABLET ingen vandret overflow på kontrolliste
+PASS · TABLET ⓘ → brochuren åbner som overlay direkte på relevant side (s. 3) — 3 / 12 · åbnet på 637 ms
+PASS · TABLET øverst: "← Tilbage til eftersyn", tydelig og ≥44 px høj — ← Tilbage til eftersyn 332×48
+PASS · TABLET tilbageknappen er stadig synlig efter scroll til s. 9
+PASS · TABLET Tilbage lukker viseren; hjælpearket ligger stadig under (samme sted)
+PASS · TABLET tilbage på præcis samme sted: fane, åbent panel, scroll, kunde/eftersyn — {"b":0,"a":0}
+PASS · TABLET ingen genindlæsning/render (samme DOM-element), ingen ny fane, URL uændret, gemt markering bevaret
+PASS · TABLET lukker med X — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · TABLET lukker med Esc — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · TABLET lukker med browserens tilbage-knap (Android) — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · TABLET arbejdsskærm: ikke-gemt tekst, foto og scroll bevaret efter hjælp (TEXTAREA#probe) — {"wb":{"y":0,"val":"IKKE-GEMT 123"},"wa":{"y":0,"val":"IKKE-GEMT 123","m":true,"view":"workScreen","photos":1}}
+PASS · TABLET PDF kan ikke indlæses: fejltekst vises, hjælp kan lukkes, arbejdet fortsætter uden tab
+PASS · MOBIL 18 kontrolpunkter; de 14 første uændret og i samme rækkefølge — 18
+PASS · MOBIL nyt eftersyn: alle 18 står som "Ikke kontrolleret" (ingen auto-OK)
+PASS · MOBIL panel viser 18 rækker, alle "Ikke kontrolleret"
+PASS · MOBIL hver række viser teksten "Ikke kontrolleret"
+PASS · MOBIL alle 18 kan sættes til OK/Afvigelse/Ikke relevant og tilbage til Ikke kontrolleret — 18 punkter
+PASS · MOBIL ⓘ ved alle 18; 14 har fuld hjælp, 4 siger tydeligt "Ikke beskrevet i brochuren" — 14 fuld, ikke beskrevet: belysning/gangarealer/gulv/orden
+PASS · MOBIL alle sidehenvisninger 1–12
+PASS · MOBIL knapper ≥ 32 px (ⓘ) / ≥44 px (statusknapper)
+PASS · MOBIL ingen vandret overflow på kontrolliste
+PASS · MOBIL ⓘ → brochuren åbner som overlay direkte på relevant side (s. 3) — 3 / 12 · åbnet på 212 ms
+PASS · MOBIL øverst: "← Tilbage til eftersyn", tydelig og ≥44 px høj — ← Tilbage til eftersyn 262×48
+PASS · MOBIL tilbageknappen er stadig synlig efter scroll til s. 9
+PASS · MOBIL Tilbage lukker viseren; hjælpearket ligger stadig under (samme sted)
+PASS · MOBIL tilbage på præcis samme sted: fane, åbent panel, scroll, kunde/eftersyn — {"b":0,"a":0}
+PASS · MOBIL ingen genindlæsning/render (samme DOM-element), ingen ny fane, URL uændret, gemt markering bevaret
+PASS · MOBIL lukker med X — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · MOBIL lukker med Esc — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · MOBIL lukker med browserens tilbage-knap (Android) — bliver i eftersynet, ikke forsiden — {"gone":true,"view":"wizard","tab":"skader","y":0,"reload":1,"home":false}
+PASS · MOBIL arbejdsskærm: ikke-gemt tekst, foto og scroll bevaret efter hjælp (TEXTAREA#probe) — {"wb":{"y":0,"val":"IKKE-GEMT 123"},"wa":{"y":0,"val":"IKKE-GEMT 123","m":true,"view":"workScreen","photos":1}}
+PASS · MOBIL PDF kan ikke indlæses: fejltekst vises, hjælp kan lukkes, arbejdet fortsætter uden tab
+PASS · Måling: ingen grænse vist før konstruktion er valgt
+PASS · Måling: grænse vises ikke uden bekræftet målelængde (1000 mm)
+PASS · Måling: stigeben "øverste tegning" + 1000 mm → maks. 5 mm med kildehenvisning s. 4 — Vejledende grænse fra brochuren (s. 4): maks. 5 mm.
+PASS · Måling: nederste tegning → maks. 3 mm
+PASS · Måling: "Anden / ved ikke" → ingen grænse
+PASS · Måling: over grænse → opfordring til vurdering, ikke automatisk afvigelse
+PASS · Måling: under grænse → "ikke i sig selv en godkendelse"
+PASS · Måling gemt: værdi, retning, reol, foto, kommentar, grænse+side
+PASS · Ingen automatisk godkendelse ud fra måling (kontrolpunktet er stadig "Ikke kontrolleret")
+PASS · Måling diagonaler: grænse 10 mm, s. 5
+PASS · Måling: illustration åbner på s. 4
+PASS · Måling: indtastet værdi bevaret efter visning af illustration (ikke-gemt)
+PASS · Afvigelse → knap "＋ Registrér skade" tilbydes
+PASS · Afvigelse åbner skaderegistrering med kontrolpunkt/skadetype forvalgt — men INGEN risikoklasse eller handling forvalgt — {"view":"workScreen","types":["stolpe"],"cls":null,"acts":0,"ck":"stolper"}
+PASS · Skade gemt med inspektørens egen risikoklasse + kontrolpunkt-reference — [{"c":"red","cp":"stolper"}]
+PASS · Afslut: viser "0 af 18 kontrolleret · 18 ikke kontrolleret" — Kontrolliste: 0 af 18 kontrolleret · 18 ikke kontrolleret. Rapporten viser tydeligt, at di
+PASS · Færdig-skærm: viser ikke "fuldt kontrolleret" (viser 0 af 18)
+PASS · PDF: "Kontrolliste (18 kontrolpunkter)" med 18 × IKKE KONTROLLERET — 18
+PASS · PDF: de 4 nye punkter fremgår
+PASS · PDF: ingen "Alle 14 … godkendt" og ingen "Godkendt — ingen udestående skader"
+PASS · PDF: manglende skader giver ikke "Godkendt" alene — samlet vurdering er inspektørens ("vurderet af inspektøren")
+PASS · PDF skelner: Kontrolleret og OK / Registreret afvigelse / Ikke relevant / IKKE KONTROLLERET
+PASS · PDF: målinger med grænse + kilde og "ikke i sig selv en godkendelse"
+PASS · Genbrug: valgmulighed vises kun når kunden har tidligere eftersyn — Start ud fra seneste eftersyn (21-11-2026 · RS-2026-0003): 2 reoler
+PASS · Genbrug er valgfri: uden afkrydsning starter eftersynet tomt
+PASS · Genbrug kopierer reolregister (reolnumre, hal, type, producent) — A-01|Hal A|Pallereol|X,A-02|Hal A|Pallereol|X
+PASS · Genbrug overfører INGEN kontrolresultater, vurdering, underskrifter, skader eller målinger; kontrolliste tom — {"reoler":"A-01|Hal A|Pallereol|X,A-02|Hal A|Pallereol|X","cl":"{}","v":null,"sig":"{\"inspector\":null,\"customer\":null}","sk":0,"ms":0,"basedOn":true,"ver":18,"status":"open","rep":null}
+PASS · Tidligere eftersyn er uændret (ikke overskrevet)
+PASS · Historik: tidligere skade vises (type, reol, oprindelig status, dato) — men ligger ikke i nye skader
+PASS · Ældre lukket eftersyn (14 punkter) bevarer sine 14 værdier og vurdering — {"lp":14,"lc":248,"lv":"yellow","ver":14,"fp":18,"fc":"{}","fa":true,"fs":{"ok":0,"fejl":0,"ikr":0,"unc":18,"total":18,"done":0}}
+PASS · Åbent eftersyn med RC5.3-autogenereret tjekliste: nulstilles til "Ikke kontrolleret" (original gemt), 18 punkter
+PASS · Ældre eftersyn åbner og viser korrekt (færdig-skærm "14 punkter")
+PASS · Ældre eftersyns PDF: "Kontrolliste (14 kontrolpunkter)", Vanger = afvigelse, ingen af de 4 nye
+PASS · Åbent ældre eftersyn: skader-fane vises med 18 rækker
+PASS · OFFLINE: appen genindlæses uden netværk og registreringen står tilbage
+PASS · OFFLINE: ⓘ → brochure åbner på s. 3 og vises (12 sider)
+PASS · OFFLINE: registrering virker uden netværk
 PASS · Appen henter intet fra reoler-as.dk
 PASS · Ingen JavaScript-fejl```
 
-## Regression (tidligere suiter kørt mod RC5.4)
-- RC5.1/5.2-suite: 31 bestået, 1 afvigelse = forventet versionsstreng i backup (`RC5.3` → nu `RC5.4`).
-- RC5.2-suite: 41/41 bestået. Logo-fil-suite (A–D): 13/13 bestået.
-- RC5.3-suite: 42 bestået, 3 afvigelser = testen forventer indlejret logo (data-URI); logo-fil-versionen bruger logo/-filen (kendt fra RC5.3-logo-filer, ikke en RC5.4-ændring).
+## Regression (tidligere suiter kørt mod RC5.5)
+- Grundsuite (RC5.1/5.2-funktioner, backup/import, PDF, QR m.m.): 32 bestået, 0 fejl.
+- RC5.2-suite (adressesøgning): 41/41. RC5.3-suite (logo/farver, PC/tablet/mobil): 45/45. Logo-filer (A–D): 13/13.
+- RC5.4-suite: 82 bestået, 3 afvigelser — alle samme forældede tjek i den gamle test af hjælpearkets ordlyd (arket hedder nu "Hvordan kontrolleres"); funktionen er dækket af RC5.5-testene for alle 18 ark.
 - Ingen JavaScript-fejl i nogen suite.
 
-## Bemærk
-- Sidehenvisninger er kontrolleret mod brochurens tekst (pdftotext) — 27 tjek.
-- Ikke testet: rigtig tablet/mobil-hardware og Safari/iOS; test på enhederne før udrulning. Offline kræver at appen er åbnet én gang via http/https.
+## Bemærkninger / begrænsninger
+- Tjekket for "ikke-gemte indtastninger" på arbejdsskærmen bruger en testindsat tekstboks (DOM-probe), fordi ⓘ ved skadetyper kun vises, før typen er valgt; de reelle ikke-gemte felter (måleformularen) testes direkte.
+- Ikke testet på fysisk tablet/mobil eller Safari/iOS; kamera ("capture") og tale-til-tekst er ikke afprøvet på enheder. Android-tilbageknap er testet som browserhistorik (goBack).
+- Offline kræver at appen har været åbnet én gang via http/https.
