@@ -1,0 +1,102 @@
+PASS · PC foto-trin: kamera-knap (capture) OG separat "vælg fra enhed" (uden capture) — [{"cap":"environment","mult":true},{"cap":null,"mult":true}]
+PASS · PC vælg 2 eksisterende fotos fra enheden → 2 fotos
+PASS · PC tilføj flere fotos til samme skade (3 i alt); store originaler (~1,3 MB) komprimeres ved optagelse — [114,116,116] kB
+PASS · PC foto kan ses forstørret (lightbox), "Foto 2 af 3"
+PASS · PC "Forstør" gør billedet større — 891 → 2816
+PASS · PC billedtekst skrives og gemmes på det rigtige foto
+PASS · PC foto udskiftes (billedtekst bevares)
+PASS · PC Slet kræver bekræftelse (advarsel vises, intet slettet endnu)
+PASS · PC Annullér bevarer fotoet
+PASS · PC bekræftet sletning fjerner kun det ene foto (billedtekst følger fotoet)
+PASS · PC fotos og billedtekster uændrede efter åbning/lukning af faglig hjælp (ingen genindlæsning)
+PASS · PC fotos knyttes automatisk til kunde, eftersyn, reol og skade — {"reol":"A-01","loc":"Hal A, gang 1","n":2,"caps":["",""],"cust":"Foto Test A/S","gid":"grp-wxzrnx"}
+PASS · PC skadekort viser fotos med "＋ foto"-knapper (kamera + enhed)
+PASS · PC tilføj foto til gemt skade (3 fotos)
+PASS · PC billedtekst og fotos overlever genindlæsning (gemt i enheden)
+PASS · PC "Fjern skade" advarer om at fotos slettes
+PASS · PC Annullér beholder skaden
+PASS · PC annullér arbejdsskærm med ikke-gemt foto advarer og kasserer først ved bekræftelse
+PASS · PC afsluttet eftersyn: fotos kan ses men ikke slettes/udskiftes
+PASS · TABLET foto-trin: kamera-knap (capture) OG separat "vælg fra enhed" (uden capture) — [{"cap":"environment","mult":true},{"cap":null,"mult":true}]
+PASS · TABLET vælg 2 eksisterende fotos fra enheden → 2 fotos
+PASS · TABLET tilføj flere fotos til samme skade (3 i alt); store originaler (~1,3 MB) komprimeres ved optagelse — [114,116,116] kB
+PASS · TABLET foto kan ses forstørret (lightbox), "Foto 2 af 3"
+PASS · TABLET "Forstør" gør billedet større — 820 → 1804
+PASS · TABLET billedtekst skrives og gemmes på det rigtige foto
+PASS · TABLET foto udskiftes (billedtekst bevares)
+PASS · TABLET Slet kræver bekræftelse (advarsel vises, intet slettet endnu)
+PASS · TABLET Annullér bevarer fotoet
+PASS · TABLET bekræftet sletning fjerner kun det ene foto (billedtekst følger fotoet)
+PASS · TABLET fotos og billedtekster uændrede efter åbning/lukning af faglig hjælp (ingen genindlæsning)
+PASS · TABLET fotos knyttes automatisk til kunde, eftersyn, reol og skade — {"reol":"A-01","loc":"Hal A, gang 1","n":2,"caps":["",""],"cust":"Foto Test A/S","gid":"grp-wgleee"}
+PASS · TABLET skadekort viser fotos med "＋ foto"-knapper (kamera + enhed)
+PASS · TABLET tilføj foto til gemt skade (3 fotos)
+PASS · TABLET billedtekst og fotos overlever genindlæsning (gemt i enheden)
+PASS · TABLET "Fjern skade" advarer om at fotos slettes
+PASS · TABLET Annullér beholder skaden
+PASS · TABLET annullér arbejdsskærm med ikke-gemt foto advarer og kasserer først ved bekræftelse
+PASS · TABLET afsluttet eftersyn: fotos kan ses men ikke slettes/udskiftes
+PASS · MOBIL foto-trin: kamera-knap (capture) OG separat "vælg fra enhed" (uden capture) — [{"cap":"environment","mult":true},{"cap":null,"mult":true}]
+PASS · MOBIL vælg 2 eksisterende fotos fra enheden → 2 fotos
+PASS · MOBIL tilføj flere fotos til samme skade (3 i alt); store originaler (~1,3 MB) komprimeres ved optagelse — [116,114,116] kB
+PASS · MOBIL foto kan ses forstørret (lightbox), "Foto 2 af 3"
+PASS · MOBIL "Forstør" gør billedet større — 390 → 858
+PASS · MOBIL billedtekst skrives og gemmes på det rigtige foto
+PASS · MOBIL foto udskiftes (billedtekst bevares)
+PASS · MOBIL Slet kræver bekræftelse (advarsel vises, intet slettet endnu)
+PASS · MOBIL Annullér bevarer fotoet
+PASS · MOBIL bekræftet sletning fjerner kun det ene foto (billedtekst følger fotoet)
+PASS · MOBIL fotos og billedtekster uændrede efter åbning/lukning af faglig hjælp (ingen genindlæsning)
+PASS · MOBIL fotos knyttes automatisk til kunde, eftersyn, reol og skade — {"reol":"A-01","loc":"Hal A, gang 1","n":2,"caps":["",""],"cust":"Foto Test A/S","gid":"grp-xqfnau"}
+PASS · MOBIL skadekort viser fotos med "＋ foto"-knapper (kamera + enhed)
+PASS · MOBIL tilføj foto til gemt skade (3 fotos)
+PASS · MOBIL billedtekst og fotos overlever genindlæsning (gemt i enheden)
+PASS · MOBIL "Fjern skade" advarer om at fotos slettes
+PASS · MOBIL Annullér beholder skaden
+PASS · MOBIL annullér arbejdsskærm med ikke-gemt foto advarer og kasserer først ved bekræftelse
+PASS · MOBIL afsluttet eftersyn: fotos kan ses men ikke slettes/udskiftes
+PASS · PDF: ALLE 10 fotos indgår (9 + 1; ingen grænse på 6; placeholder tæller ikke) — 21 billedobjekter
+PASS · PDF-størrelse rimelig: 10 fotos (á ~1,3 MB originalt) → 0.28 MB — 0.28 MB, 165 ms
+PASS · PDF-billeder bevarer dokumentationskvalitet (≥ ~1000 px på langsiden) — 624x132, 120x120, 120x120
+PASS · PDF: reolnummer + placering ved fotos
+PASS · PDF: skadebeskrivelse, risiko, handling og dato ved fotos
+PASS · PDF: billedtekster med
+PASS · PDF: "Foto 9 af 9" findes; skade uden foto har ingen fotoblok
+PASS · Ulæseligt foto: tydelig advarsel i PDF ("FOTO KUNNE IKKE INDLÆSES") og i appen
+PASS · PC Send-dialog nægtes før eftersynet er afsluttet og vurderet af inspektøren
+PASS · PC efter afslutning er mailstatus "klargjort" — IKKE "sendt" (selv med autosend slået til) — klargjort
+PASS · PC afslutningsskærm har tydelig knap "Send rapport til kunde" og status "Ikke sendt"
+PASS · PC modtager hentes fra kundekortet og kan redigeres
+PASS · PC rapporten forberedes med fotos; størrelse og antal vises — ✔ Rapport klar: RS-2026-0003_Send_Test_A_S.pdf · 122 kB · 5 sider · 2 fotos i rapporten
+PASS · PC standardtekst: professionelt emne + kort tekst uden falsk "vedhæftet"-påstand
+PASS · PC "Vis rapporten" viser den færdige PDF til gennemsyn (sider tegnet)
+PASS · PC tilbage fra gennemsyn → afsendelsesdialogen står uændret
+PASS · PC ugyldig modtager blokerer afsendelse (intet åbnet)
+PASS · PC: "Del PDF"-knap skjules (browser kan ikke dele filer) — og siden forklarer alternativerne
+PASS · PC: e-mailprogram åbnes (mailto) med redigeret modtager, emne og tekst — mailto:ny.modtager@firma.dk?subject=Reoleftersyn%20RS-2026-0003%20%E2%80%94%20Send%20Test%
+PASS · PC: PDF downloades samtidig og er en gyldig PDF — 125178 B
+PASS · PC: efter mailto-åbning er status IKKE "sendt" (kun "e-mailprogram åbnet … ikke vedhæftet") — e-mailprogram åbnet (PDF downloadet, ikke vedhæftet)
+PASS · PC: badge siger "IKKE bekræftet sendt"
+PASS · PC: .eml-udkast er gyldigt: modtager, emne, X-Unsent, ÉN PDF-vedhæftning — ny.modtager@firma.dk | Reoleftersyn RS-2026-0003 — Send Test A/S | 1 | 1 | RS-2026-0003_Send_Test_A_S.pdf
+PASS · PC: PDF i .eml er byte-identisk med den downloadede rapport — 4a77762becbe96a96ab6d543670b8257
+PASS · PC ingen mailstatus er "sendt" før inspektøren bekræfter
+PASS · PC først når inspektøren bekræfter, registreres "sendt (bekræftet af inspektør)" med tidspunkt — mailto → eml → download → bekræftet af inspektør
+PASS · PC rapportlisten viser "Send rapport til kunde" og bekræftet status
+PASS · MOBIL Send-dialog nægtes før eftersynet er afsluttet og vurderet af inspektøren
+PASS · MOBIL efter afslutning er mailstatus "klargjort" — IKKE "sendt" (selv med autosend slået til) — klargjort
+PASS · MOBIL afslutningsskærm har tydelig knap "Send rapport til kunde" og status "Ikke sendt"
+PASS · MOBIL modtager hentes fra kundekortet og kan redigeres
+PASS · MOBIL rapporten forberedes med fotos; størrelse og antal vises — ✔ Rapport klar: RS-2026-0003_Send_Test_A_S.pdf · 122 kB · 5 sider · 2 fotos i rapporten
+PASS · MOBIL standardtekst: professionelt emne + kort tekst uden falsk "vedhæftet"-påstand
+PASS · MOBIL "Vis rapporten" viser den færdige PDF til gennemsyn (sider tegnet)
+PASS · MOBIL tilbage fra gennemsyn → afsendelsesdialogen står uændret
+PASS · MOBIL ugyldig modtager blokerer afsendelse (intet åbnet)
+PASS · MOBIL: "Del PDF til e-mail-app" vises når enheden kan dele filer
+PASS · MOBIL: afbrudt deling (Annullér i delingsmenuen) ændrer INGEN status
+PASS · MOBIL: delingsmenuen modtager selve PDF-filen (%PDF, application/pdf, navn, størrelse) + emne og tekst — RS-2026-0003_Send_Test_A_S.pdf 125178 B
+PASS · MOBIL: efter deling er status "delt via enhedens delingsmenu" — IKKE "sendt" — delt via enhedens delingsmenu
+PASS · MOBIL ingen mailstatus er "sendt" før inspektøren bekræfter
+PASS · MOBIL først når inspektøren bekræfter, registreres "sendt (bekræftet af inspektør)" med tidspunkt — share → bekræftet af inspektør
+PASS · MOBIL rapportlisten viser "Send rapport til kunde" og bekræftet status
+PASS · Appen henter intet fra eksterne mailtjenester (ingen ny betalt tjeneste/database)
+PASS · Ingen JavaScript-fejl
